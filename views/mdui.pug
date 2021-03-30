@@ -1,0 +1,25 @@
+doctype html
+html(lang="zh-cmn-Hans")
+    head
+        block head
+        title #{title}+#{postfix}
+        meta(charset="utf8")
+        link(rel="stylesheet" href="/mdui/css/mdui.min.css")
+        script(src="/mdui/js/mdui.min.js")
+        script(src="/javascripts/jquery.min.js")
+        script(src="/javascripts/menuDraw.js")
+        link(rel="stylesheet" href="/stylesheets/custom.css")
+
+    body.mdui-appbar-with-toolbar.mdui-theme-primary-cyan
+        .mdui-appbar.mdui-appbar-fixed
+            .mdui-toolbar.mdui-color-theme
+                a.mdui-btn.mdui-btn.mdui-btn-icon.mdui-ripple#drawerBtn
+                    i.mdui-icon.material-icons menu
+                a.mdui-headline.mdui-typo-title #{title}
+        .mdui-drawer.mdui-drawer-close#drawerContainer
+            block drawer
+        .mdui-container
+            block content
+
+    script(src="/javascripts/drawer.js")
+    block end

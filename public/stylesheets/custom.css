@@ -1,0 +1,23 @@
+.mdui-drawer {
+    display: flex;
+    flex-direction: column;
+}
+
+.mdui-list {
+    flex: 1;
+}
+
+.copyright {
+    color: rgba(0, 0, 0, .38);
+    margin: 12px;
+    text-align: left;
+}
+
+.copyright > p {
+    font-size: 14px;
+    margin: 10px 0;
+}
+
+#ECUPL {
+    font-size: 4px;
+}

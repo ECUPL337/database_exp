@@ -1,0 +1,6 @@
+POST {{host}}/api/register
+content-type: application/json
+
+{
+  "username": "admin"
+}
