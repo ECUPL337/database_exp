@@ -9,15 +9,24 @@
 
 .copyright {
     color: rgba(0, 0, 0, .38);
-    margin: 12px;
+    margin: 10px 0;
+    padding: 0 10px 10px;
     text-align: left;
+    overflow: hidden;
 }
 
 .copyright > p {
     font-size: 14px;
-    margin: 10px 0;
+    margin: 5px 0;
 }
 
 #ECUPL {
-    font-size: 4px;
+    width: 100%;
+    white-space: break-spaces;
+    overflow-wrap: break-word;
+    height: auto;
+    word-wrap: break-word;
+    font-size: 12px;
+    margin: 0;
+    padding: 0;
 }

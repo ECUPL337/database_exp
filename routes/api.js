@@ -1,7 +1,9 @@
-const express = require('express');
-const Database = require('better-sqlite3');
-const router = express.Router();
+const router = require('express').Router();
+const db = require('../db/db');
 
+router.get('/*', ((req, res) => {
+    res.redirect('/');
+}))
 
 router.post('/register', async (req, res) => {
     let base = req.baseUrl
@@ -9,18 +11,61 @@ router.post('/register', async (req, res) => {
     res.send('Register' + base);
 });
 
-router.post('/login', async (req, res) => {
-    const login = req.body
-    console.log(login);
-    res.send('login');
-});
 
-router.post('/adminLogin', async (req, res) => {
-    res.send('adminLogin');
-});
+router.post('/adminLogin', async (req, res, next) => {
+    if(req.body){
+        const dbRes = db.DB_adminLogin({
+            username:req.body.username,
+            password:req.body.password
+        })
 
-router.get('/debug', (req, res, next) => {
+        if(dbRes) {
+            req.session.adminUserID = dbRes.ID;
+            res.send( {
+                res: true,
+                errMsg: "登录成功"
+            });
 
+        }
+        else res.send({
+            res:false,
+            errMsg:"登录信息错误",
+            dbRes: dbRes
+
+        });
+    }
+    else res.send({
+        res:false,
+        errMsg:"参数错误"
+    });
+})
+
+router.post('/login', async (req, res, next) => {
+    if(req.body){
+        const dbRes = db.DB_login({
+            username:req.body.username,
+            password:req.body.password
+        })
+
+        if(dbRes) {
+            req.session.userID = dbRes.ID;
+            res.send( {
+                res: true,
+                errMsg: "登录成功"
+            });
+
+        }
+        else res.send({
+            res:false,
+            errMsg:"登录信息错误",
+            dbRes: dbRes
+
+        });
+    }
+    else res.send({
+        res:false,
+        errMsg:"参数错误"
+    });
 })
 
 module.exports = router;

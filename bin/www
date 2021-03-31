@@ -1,13 +1,20 @@
 #!/usr/bin/env node
+/**
+ * Global Variable
+ */
+const {
+    default_port = 10085,
+    max_cookie_life = 60000, // 10 Minutes
+} = process.env;
 
 /**
  * Module dependencies.
  */
 const app = require('../app');
-const debug = require('debug')('db-exp:server');
 const http = require('http');
-const sqlite = require('better-sqlite3');
-const default_port = '10085'
+const util = require('util');
+const debuglog = util.debuglog('dev')
+
 /**
  * Get port from environment and store in Express.
  */
@@ -86,7 +93,7 @@ function onListening() {
     let bind = typeof addr === 'string'
         ? 'pipe ' + addr
         : 'port ' + addr.port;
-    debug('Listening on ' + bind);
+    debuglog('Listening on ' + bind);
 }
 
 process.on('SIGTERM', () => {

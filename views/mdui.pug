@@ -2,13 +2,13 @@ doctype html
 html(lang="zh-cmn-Hans")
     head
         block head
-        title #{title}+#{postfix}
+        title #{title + postfix}
         meta(charset="utf8")
         link(rel="stylesheet" href="/mdui/css/mdui.min.css")
         script(src="/mdui/js/mdui.min.js")
-        script(src="/javascripts/jquery.min.js")
-        script(src="/javascripts/menuDraw.js")
-        link(rel="stylesheet" href="/stylesheets/custom.css")
+        script(src="/jquery/jquery.js")
+        script(src="/statics/javascript/menuDraw.js")
+        link(rel="stylesheet" href="/statics/stylesheets/custom.css")
 
     body.mdui-appbar-with-toolbar.mdui-theme-primary-cyan
         .mdui-appbar.mdui-appbar-fixed
@@ -21,5 +21,5 @@ html(lang="zh-cmn-Hans")
         .mdui-container
             block content
 
-    script(src="/javascripts/drawer.js")
+    script(src="/statics/javascript/drawer.js")
     block end

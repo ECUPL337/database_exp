@@ -1,3 +1,5 @@
 /node_modules
 /.idea
 *.http
+package-lock.json
+rest-client.env.json

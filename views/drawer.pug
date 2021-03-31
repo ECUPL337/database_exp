@@ -1,16 +1,37 @@
 extends mdui
-
 block drawer
     ul.mdui-list#drawer
         li.mdui-list-item.mdui-ripple#home
             i.mdui-list-item-icon.mdui-icon.material-icons &#xe88a
             .mdui-list-item-content 首页
-        li.mdui-list-item.mdui-ripple#login
-            i.mdui-list-item-icon.mdui-icon.material-icons &#xe890
-            .mdui-list-item-content 登录
-        li.mdui-list-item.mdui-ripple#register
-            i.mdui-list-item-icon.mdui-icon.material-icons &#xe7fe
-            .mdui-list-item-content 注册
+        li.mdui-divider
+        if isLogin
+            li.mdui-list-item.mdui-ripple#record
+                i.mdui-list-item-icon.mdui-icon.material-icons &#xe890
+                .mdui-list-item-content 消费记录
+            li.mdui-list-item.mdui-ripple#redeem
+                i.mdui-list-item-icon.mdui-icon.material-icons &#xe7fe
+                .mdui-list-item-content 积分兑换
+            li.mdui-list-item.mdui-ripple#logout
+                i.mdui-list-item-icon.mdui-icon.material-icons &#xe7fe
+                .mdui-list-item-content 退出
+        else if isAdminLogin
+            li.mdui-list-item.mdui-ripple#dashboard
+                i.mdui-list-item-icon.mdui-icon.material-icons &#xe890
+                .mdui-list-item-content Dashboard
+            li.mdui-list-item.mdui-ripple#test
+                i.mdui-list-item-icon.mdui-icon.material-icons &#xe7fe
+                .mdui-list-item-content Test
+            li.mdui-list-item.mdui-ripple#logout
+                i.mdui-list-item-icon.mdui-icon.material-icons &#xe7fe
+                .mdui-list-item-content 退出
+        else
+            li.mdui-list-item.mdui-ripple#login
+                i.mdui-list-item-icon.mdui-icon.material-icons &#xe890
+                .mdui-list-item-content 登录
+            li.mdui-list-item.mdui-ripple#register
+                i.mdui-list-item-icon.mdui-icon.material-icons &#xe7fe
+                .mdui-list-item-content 注册
         li.mdui-divider
         li.mdui-list-item.mdui-ripple#about
             i.mdui-list-item-icon.mdui-icon.material-icons &#xe88e
@@ -18,5 +39,4 @@ block drawer
         li.mdui-divider
     .copyright
         p © 2021 Jas0n2K.
-        #ECUPL East China University of
-        #ECUPL Political Science and Laws
+        #ECUPL East China University of Political Science and Laws

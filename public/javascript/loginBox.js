@@ -19,5 +19,6 @@ $().ready(() => {
 
     $('#AdminLoginBtn').click(function () {
         console.log("test")
+
     })
 })

@@ -1,9 +1,19 @@
 const express = require('express');
 const router = express.Router();
 
-let postfix = ' - 超市会员管理系统'
+const postfix = ' - 超市会员管理系统'
+
+const redirectLogin = (req, res, next) => {
+    if((!req.session.adminUserID) ||(!req.session.userID)){
+        res.redirect('/login')
+    } else {
+        next();
+    }
+}
+
 
 router.get('/', function (req, res, next) {
+
     res.render('index', {title: '首页', postfix: postfix});
 });
 

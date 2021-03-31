@@ -1,19 +1,46 @@
 const Database = require('better-sqlite3');
-const db = new Database('Supermarket.db', {verbose: console.log, fileMustExist: true});
+const path = require('path');
+const debuglog = require('util').debuglog('dev');
 
-// const DB_login = db.prepare(
-//     'SELECT * FROM Customer WHERE CLogin = @Username AND CPassword = @Password'
-// );
-
-//  const DB_adminLogin = db.prepare(
-//     'SELECT * FROM Admin WHERE Login = @Username AND Password = @Password'
-// ).get();
-
-const table = db.prepare('SELECT name FROM sqlite_master WHERE type = ?').all('table');
-console.log(table);
-// const DB_adminLogin = sql.prepare('SELECT * FROM "Admin" WHERE Login=@username AND Password=@password');
-// const DB_login = sql.prepare('SELECT * FROM Customer WHERE CLogin=? AND CPassword=?');
+const db_path = path.join(__dirname,'Supermarket.db');
+const db = new Database(db_path, {verbose: debuglog, fileMustExist: true});
 
 
-module.exports = {};
+const login = db.prepare(
+    'SELECT * FROM Customer WHERE CLogin = @Username AND CPassword = @Password'
+);
+
+const adminLogin = db.prepare(`SELECT * FROM "Admin" WHERE Login=@username AND Password=@password`);
+
+// const table = db.prepare(`SELECT name FROM sqlite_master where type IS 'table' ORDER BY name`);
+
+const register = db.prepare(`INSERT INTO Customer (CLogin, CPassword, CPhone, CBirthday, CWork, CRegDate) VALUES (@username, @password, @phone, @birthday, @workplace,@regDate);`);
+
+
+const DB_adminLogin = form => {
+    const res = adminLogin.get(
+        {
+            username: form.username,
+            password: form.password
+        }
+    );
+    return res;
+}
+
+const DB_login = form => {
+    const res = login.get(
+        {
+            Username: form.username,
+            Password: form.password
+        }
+    );
+    return res;
+}
+
+const DB_register = form => {
+    const res = register.exec();
+}
+
+
+module.exports = {DB_adminLogin, DB_login};
 //DB_login, DB_adminLogin
