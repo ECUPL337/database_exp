@@ -12,8 +12,7 @@ const {
  */
 const app = require('../app');
 const http = require('http');
-const util = require('util');
-const debuglog = util.debuglog('dev')
+const debuglog = require('util').debuglog('dev')
 
 /**
  * Get port from environment and store in Express.

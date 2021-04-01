@@ -1,23 +1,22 @@
 extends drawer
 
 append head
-    link(rel="stylesheet" href="/statics/stylesheets/loginBox.css")
+    //link(rel="stylesheet" href="/statics/stylesheets/loginBox.css")
 block content
     #loginBox.mdui-card.mdui-m-t-5
         form#loginForm.mdui-card-media.mdui-p-a-2
-            div.mdui-textfield
+            .mdui-textfield
                 i.mdui-icon.material-icons account_circle
                 lable.mdui-textfield-label 用户名
-                input.mdui-textfield-input(type="text" form="loginForm" name="username" required)
-            div.mdui-textfield
+                input.mdui-textfield-input(type="text" form="loginForm" name="username" pattern="^[A-Za-z0-9]*$" required)
+            .mdui-textfield
                 i.mdui-icon.material-icons lock
                 lable.mdui-textfield-label 密码
-                input.mdui-textfield-input(type="password" form="loginForm" name="password" required)
+                input.mdui-textfield-input(type="password" form="loginForm" name="password" pattern="[A-Za-z0-9]*$" required)
 
         .mdui-card-actions
             button.mdui-btn.mdui-ripple#loginBtn 登录
             button.mdui-btn.mdui-ripple#AdminLoginBtn 管理员登录
-            button.mdui-btn.mdui-ripple#register 注册
-
+            button.mdui-btn.mdui-ripple#register(onclick="window.location.href='/register'") 注册
 append end
     script(src="/statics/javascript/loginBox.js")

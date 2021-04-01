@@ -1,3 +1,36 @@
 extends drawer
 
+append head
+    //link(rel="stylesheet" href="/statics/stylesheets/register.css")
 block content
+    .mdui-card.mdui-m-t-5
+        form#regForm.mdui-card-media.mdui-p-a-2(autocomplete="off")
+            .mdui-textfield
+                i.mdui-icon.material-icons account_circle
+                lable.mdui-textfield-label 用户名
+                input.mdui-textfield-input(type="text" form="regForm" name="username" pattern="^[A-Za-z0-9]*$" maxlength=10  required)
+            .mdui-textfield
+                i.mdui-icon.material-icons lock
+                lable.mdui-textfield-label 密码
+                input.mdui-textfield-input(type="password" form="regForm" name="password" pattern="^[A-Za-z0-9]*$" autocomplete="new-password" maxlength=20 required)
+            .mdui-textfield
+                i.mdui-icon.material-icons phone
+                lable.mdui-textfield-label 手机号
+                input.mdui-textfield-input(type="text" form="regForm" name="phone" pattern="^1[3-9][0-9]{9}$" maxlength=11 required)
+            .mdui-textfield
+                i.mdui-icon.material-icons work
+                lable.mdui-textfield-label 单位
+                input.mdui-textfield-input(type="text" form="regForm" name="workplace" pattern="^[\u4e00-\u9fa5a-zA-Z0-9]{1,40}$" maxlength=40 required)
+            .mdui-textfield
+                i.mdui-icon.material-icons person
+                lable.mdui-textfield-label 姓名
+                input.mdui-textfield-input(type="text" form="regForm" name="name" pattern="^[\u4e00-\u9fa5a-zA-Z0-9]{1,10}$"  maxlength=12 required)
+            .mdui-textfield
+                i.mdui-icon.material-icons date_range
+                lable.mdui-textfield-label 生日
+                input.mdui-textfield-input(type="date" form="regForm" name="birthday" min="1950-01-01" max="2008-01-01" required)
+        .mdui-card-actions
+            button.mdui-btn.mdui-ripple#regBtn 注册
+            button.mdui-btn.mdui-ripple#resetBtn 重置
+append end
+    script(src="/statics/javascript/register.js")

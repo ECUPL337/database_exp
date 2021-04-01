@@ -4,7 +4,6 @@ const session = require('express-session');
 const path = require('path');
 const logger = require('morgan'); //Since v1.5.0, cookie-parser no longer needs to be used.
 const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
 const apiRouter = require('./routes/api');
 const app = express();
 
@@ -19,18 +18,9 @@ app.use(logger('dev'));
 app.use(express.json()); // Replace "bodyParser"
 app.use(express.urlencoded({extended: true}));
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/api', apiRouter);
-app.use(session({
-    secret: 'ECUPL',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: false,
-        // maxAge: max_cookie_life,
-        sameSite:true // 'strict'
-    }
-}))
+
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
