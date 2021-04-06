@@ -27,21 +27,23 @@ $().ready(function () {
             $.post('/api/logout', function (data) {
                 console.log(data);
                 if (data.logout) {
-                    mdui.dialog({
-                        title: '退出成功',
-                        content: '您已经成功退出登录',
-                        buttons: [
-                            {
-                                text: '返回首页',
-                                close: false,
-                                onClick: () => {
-                                    window.location.href = "./";
-                                }
+                    history:false,
+                        mdui.dialog({
+                            title: '退出成功',
+                            content: '您已经成功退出登录',
+                            buttons: [
+                                {
+                                    text: '返回首页',
+                                    close: false,
+                                    onClick: () => {
+                                        window.location.href = "./";
+                                    }
 
-                            }]
-                    })
+                                }]
+                        })
                 } else {
                     mdui.dialog({
+                        history: false,
                         title: '错误',
                         content: data.errMsg,
                         buttons: [{

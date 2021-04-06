@@ -1,22 +1,32 @@
+/*
+ API Router File
+ Path: /api
+ */
+
 const router = require('express').Router();
 const db = require('../db/db');
-const session = require('express-session');
 
-router.use(session({
-    name: 'sid',
-    secret: 'ECUPL',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: false,
-        // maxAge: max_cookie_life,
-        sameSite: true // 'strict'
+
+const authenticateAdmin = (req, res, next) => {
+    if (!!req.session.adminUserID) {
+        next();
+    } else {
+        res.send({
+            res: false,
+            errMsg: "User is not logged in."
+        })
+        res.end();
     }
-}))
+}
 
+/*
+    Redirect all GET requests to index.
+ */
 router.get('/*', ((req, res) => {
     res.redirect('/');
+    res.end();
 }))
+
 
 router.post('/register', async (req, res) => {
     if (Object.keys(req.body).length === 0) {
@@ -28,11 +38,15 @@ router.post('/register', async (req, res) => {
 });
 
 
-router.post('/adminLogin', async (req, res, next) => {
+router.post('/adminLogin', async (req, res) => {
     if (req.body) {
         const dbRes = db.DB_adminLogin(req.body)
         if (dbRes) {
+
+            req.session.adminLevel = dbRes.Level;
             req.session.adminUserID = dbRes.ID;
+            req.session.userName = dbRes.Login
+
             res.send({
                 res: true,
                 errMsg: "登录成功",
@@ -52,15 +66,13 @@ router.post('/adminLogin', async (req, res, next) => {
 })
 
 router.post('/login', async (req, res) => {
-    if (req.body) {
-        const dbRes = db.DB_login({
-            username: req.body.username,
-            password: req.body.password
-        })
+    if (!!req.body) {
+        const dbRes = db.DB_login(req.body);
 
         if (dbRes) {
             req.session.userID = dbRes.CID;
-            req.session.CName = dbRes.CName;
+            req.session.userName = dbRes.CName;
+
             res.send({
                 res: true,
                 errMsg: "登录成功",
@@ -101,4 +113,18 @@ router.post('/logout', (req, res) => {
         });
     }
 })
+
+/*
+    Error Handler
+ */
+
+router.post('/*', (req, res) => {
+    res.status(404);
+    res.send({
+        res: false,
+        errMsg: "404 Not Found"
+    })
+    res.end();
+})
+
 module.exports = router;

@@ -1,22 +1,19 @@
 const Database = require('better-sqlite3');
 const path = require('path');
-const debuglog = require('util').debuglog('dev');
 
 const db_path = path.join(__dirname, 'Supermarket.db');
-const db = new Database(db_path, {verbose: debuglog, fileMustExist: true});
+const db = new Database(db_path, {verbose: console.log, fileMustExist: true});
 
 
-const getTable = db.prepare(`SELECT name FROM sqlite_master where type IS 'table' ORDER BY name`);
+/*
+    If the database does not exist, create one.
+    const getTable = db.prepare(`SELECT name FROM sqlite_master where type IS 'table' ORDER BY name`);
 
-const SQLInit = `CREATE TABLE Admin (
- ID INTEGER NOT NULL UNIQUE,
- Login TEXT NOT NULL UNIQUE,
- Password TEXT NOT NULL,
- Level INTEGER NOT NULL DEFAULT 1 CHECK("Level" > 0),
- PRIMARY KEY("ID" AUTOINCREMENT)
-);
-`
+*/
 
+/*
+   Called by api.js
+ */
 
 const adminLogin = db.prepare(`SELECT * FROM "Admin" WHERE Login=@username AND Password=@password`);
 
@@ -24,7 +21,7 @@ const DB_adminLogin = form => {
     return adminLogin.get(
         {
             username: form.username,
-            password: form.password
+            password: form.password,
         }
     );
 }
@@ -42,7 +39,12 @@ const DB_login = form => {
     );
 }
 
-const register = db.prepare(`INSERT INTO Customer (CLogin, CPassword, CPhone, CBirthday, CWork, CRegDate, CName) VALUES (@CLogin, @CPassword, @CPhone, @CBirthday, @CWork,@CRegDate,@CName);`);
+
+/*
+    Pre-handle data got from the database, and return error messages.
+ */
+const register = db.prepare(`INSERT INTO Customer (CLogin, CPassword, CPhone, CBirthday, CWork, CRegDate, CName)
+                             VALUES (@CLogin, @CPassword, @CPhone, @CBirthday, @CWork, @CRegDate, @CName);`);
 
 const DB_register = form => {
     let re = /.* /g;
@@ -77,7 +79,6 @@ const DB_register = form => {
             msg['errItem'] = e.message;
             msg['errType'] = 'OTHER'
         }
-        ;
 
     } finally {
         return msg;
@@ -85,5 +86,28 @@ const DB_register = form => {
 
 }
 
+/*
+    Database Transaction
+ */
+const newPurchase = db.prepare(`INSERT INTO Purchase (CID, GID, PAmount, PTime, PMoney)
+                                VALUES (@CID, @GID, @PAmount, @PTime, @PMoney)`)
+const updateUserCredit = db.prepare(`UPDATE Customer
+                                     SET CCredit = CCredit + @PMoney,
+                                         CSum    = CSum + @PMoney
+                                     WHERE CID = @CID`)
+const purchase = db.transaction(form => {
+    newPurchase.run(form);
+    updateUserCredit.run(form);
+})
 
-module.exports = {DB_adminLogin, DB_login, DB_register};
+const DB_purchase = form => {
+    try {
+
+    } catch {
+
+    } finally {
+
+    }
+}
+
+module.exports = {DB_adminLogin, DB_login, DB_register, DB_purchase};

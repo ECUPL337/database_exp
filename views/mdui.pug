@@ -15,7 +15,7 @@ html(lang="zh-cmn-Hans")
                 a.mdui-btn.mdui-btn.mdui-btn-icon.mdui-ripple#drawerBtn
                     i.mdui-icon.material-icons menu
                 a.mdui-headline.mdui-typo-title #{title}
-        .mdui-drawer.mdui-drawer-close#drawerContainer
+        .mdui-drawer.mdui-drawer-open#drawerContainer
             block drawer
                 ul.mdui-list#drawer
                     li.mdui-list-item.mdui-ripple#home
@@ -29,19 +29,18 @@ html(lang="zh-cmn-Hans")
                         li.mdui-list-item.mdui-ripple#redeem
                             i.mdui-list-item-icon.mdui-icon.material-icons &#xe7fe
                             .mdui-list-item-content 积分兑换
-                        li.mdui-list-item.mdui-ripple#logout
-                            i.mdui-list-item-icon.mdui-icon.material-icons &#xe7fe
-                            .mdui-list-item-content 退出
                     else if isAdminLogin
-                        li.mdui-list-item.mdui-ripple#dashboard
-                            i.mdui-list-item-icon.mdui-icon.material-icons &#xe890
-                            .mdui-list-item-content Dashboard
+                        if adminLevel > 1
+                            li.mdui-list-item.mdui-ripple#dashboard
+                                i.mdui-list-item-icon.mdui-icon.material-icons &#xe871
+                                .mdui-list-item-content Dashboard
                         li.mdui-list-item.mdui-ripple#test
-                            i.mdui-list-item-icon.mdui-icon.material-icons &#xe7fe
-                            .mdui-list-item-content Test
+                            i.mdui-list-item-icon.mdui-icon.material-icons &#xe227
+                            .mdui-list-item-content 收银
+                    if isLogin || isAdminLogin
                         li.mdui-list-item.mdui-ripple#logout
                             i.mdui-list-item-icon.mdui-icon.material-icons &#xe7fe
-                            .mdui-list-item-content 退出
+                            .mdui-list-item-content 退出登录
                     else
                         li.mdui-list-item.mdui-ripple#login
                             i.mdui-list-item-icon.mdui-icon.material-icons &#xe890

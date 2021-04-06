@@ -39,6 +39,7 @@ $().ready(() => {
                         closeOnEsc: false,
                         modal: true,
                         content: '欢迎您，' + data.CName,
+                        history: false,
                         buttons: [
                             {
                                 text: '现在登录',
@@ -60,16 +61,20 @@ $().ready(() => {
                     mdui.dialog({
                         modal: true,
                         title: '注册失败',
-                        content: itemName[data.errItem]+ errType[data.errType],
+                        history: false,
+                        content: itemName[data.errItem] + errType[data.errType],
                         buttons: [
-                            {text: '好的',
-                            close:true}
+                            {
+                                text: '好的',
+                                close: true
+                            }
                         ]
                     })
                 }
             })
                 .fail(function () {
                     mdui.dialog({
+                        history: false,
                         title: '网络错误',
                         content: '请检查网络连接',
                         buttons: [
@@ -83,7 +88,8 @@ $().ready(() => {
 
     $('#resetBtn').click(()=>{
         mdui.dialog({
-            title:"操作确认",
+            history: false,
+            title: "操作确认",
             content: '确认要重置已填写的信息吗？',
             modal: false,
             buttons: [{
@@ -92,8 +98,8 @@ $().ready(() => {
             },
                 {
                     text: '确认',
-                    close:true,
-                    onClick: ()=> {
+                    close: true,
+                    onClick: () => {
                         form[0].reset();
                     }
                 }]
