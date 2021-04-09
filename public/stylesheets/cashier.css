@@ -1,0 +1,26 @@
+.quan {
+    display: flex;
+    /*Default:
+    flex-flow: row nowrap;
+    */
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 16px 0;
+}
+
+.quan > .mdui-textfield {
+    width: calc(100% - 60px)
+}
+
+.btnEmbedded {
+    flex-direction: column;
+    width: 50px;
+    margin-left: 10px;
+    padding-bottom: 8px;
+}
+
+.btnEmbedded .mdui-btn {
+    min-width: 50px;
+    padding: 0px;
+    margin: 4px 0px;
+}

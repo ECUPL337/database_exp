@@ -10,37 +10,34 @@ $().ready(function () {
         login: '/login',
         register: '/register',
         about: '/about',
-        dashboard: '/dashboard'
+        dashboard: '/dashboard',
+        cashier: '/cashier'
     }
     drawerItem.each(function () {
-        if (render[this.id] !== undefined) {
+        if (!!render[this.id]) {
             $(this).click(() => {
-                console.log('yes')
                 window.location.replace(render[this.id]);
             })
         }
-
     })
     if ($('#logout')) {
         $('#logout').click(function () {
-            inst.close();
+            // inst.close();
             $.post('/api/logout', function (data) {
-                console.log(data);
-                if (data.logout) {
-                    history:false,
-                        mdui.dialog({
-                            title: '退出成功',
-                            content: '您已经成功退出登录',
-                            buttons: [
-                                {
-                                    text: '返回首页',
-                                    close: false,
-                                    onClick: () => {
-                                        window.location.href = "./";
-                                    }
-
-                                }]
-                        })
+                if (data.res) {
+                    mdui.dialog({
+                        title: '退出成功',
+                        content: '您已经成功退出登录',
+                        history: false,
+                        buttons: [
+                            {
+                                text: '返回首页',
+                                close: false,
+                                onClick: () => {
+                                    window.location.href = "./";
+                                }
+                            }]
+                    })
                 } else {
                     mdui.dialog({
                         history: false,
@@ -52,7 +49,6 @@ $().ready(function () {
                             onClick: () => {
                                 window.location.href = '/login?dm=1'
                             }
-
                         }]
                     })
                 }

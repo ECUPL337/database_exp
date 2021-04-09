@@ -4,23 +4,27 @@ html(lang="zh-cmn-Hans")
         block head
         title #{title + postfix}
         meta(charset="utf8")
+        meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no")
         link(rel="stylesheet" href="/mdui/css/mdui.min.css")
         script(src="/mdui/js/mdui.min.js")
         script(src="/jquery/jquery.js")
         link(rel="stylesheet" href="/statics/stylesheets/custom.css")
 
-    body.mdui-appbar-with-toolbar.mdui-theme-primary-cyan
+    body.mdui-appbar-with-toolbar.mdui-theme-primary-cyan.mdui-drawer-body-left.mdui-theme-accent-cyan
         .mdui-appbar.mdui-appbar-fixed
             .mdui-toolbar.mdui-color-theme
                 a.mdui-btn.mdui-btn.mdui-btn-icon.mdui-ripple#drawerBtn
                     i.mdui-icon.material-icons menu
                 a.mdui-headline.mdui-typo-title #{title}
-        .mdui-drawer.mdui-drawer-open#drawerContainer
+        .mdui-drawer#drawerContainer
             block drawer
                 ul.mdui-list#drawer
                     li.mdui-list-item.mdui-ripple#home
                         i.mdui-list-item-icon.mdui-icon.material-icons &#xe88a
                         .mdui-list-item-content 首页
+                    li.mdui-list-item.mdui-ripple#cashier
+                        i.mdui-list-item-icon.mdui-icon.material-icons &#xe227
+                        .mdui-list-item-content 收银
                     li.mdui-divider
                     if isLogin
                         li.mdui-list-item.mdui-ripple#record
@@ -34,9 +38,7 @@ html(lang="zh-cmn-Hans")
                             li.mdui-list-item.mdui-ripple#dashboard
                                 i.mdui-list-item-icon.mdui-icon.material-icons &#xe871
                                 .mdui-list-item-content Dashboard
-                        li.mdui-list-item.mdui-ripple#test
-                            i.mdui-list-item-icon.mdui-icon.material-icons &#xe227
-                            .mdui-list-item-content 收银
+
                     if isLogin || isAdminLogin
                         li.mdui-list-item.mdui-ripple#logout
                             i.mdui-list-item-icon.mdui-icon.material-icons &#xe7fe
