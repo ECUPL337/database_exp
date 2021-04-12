@@ -1,0 +1,49 @@
+extends mdui
+
+append head
+    link(rel="stylesheet" href="/statics/stylesheets/cashier.css")
+block content
+    #cashierAdd.mdui-card.mdui-m-t-2.mdui-m-b-1
+        #cashierForm.mdui-card-media.mdui-p-a-2
+            .mdui-textfield
+                i.mdui-icon.material-icons &#xe8cc
+                lable.mdui-textfield-label 商品编号
+                input.mdui-textfield-input(type="text" name="GID" pattern="^[0-9]*$" maxlength=20 required autofocus)
+            .quan
+                .mdui-textfield
+                    i.mdui-icon.material-icons &#xe03c
+                    lable.mdui-textfield-label 数量
+                    input.mdui-textfield-input(type="number" name="quantity" min=1 max=9999 value=1 required)
+                .btnEmbedded
+                    button.mdui-btn.mdui-ripple.mdui-btn-raised +1
+                    button.mdui-btn.mdui-ripple.mdui-btn-raised +10
+
+
+            .mdui-card-actions
+                button.mdui-btn.mdui-ripple#addBtn 添加
+    #tableContainer.mdui-table-fluid
+        table.mdui-table.mdui-table-hoverable
+            thead
+                tr
+                    th 序号
+                    th 商品编号
+                    th 商品名
+                    th 商品单价
+                    th 商品数量
+                    th 总价
+            tbody
+            tfoot
+                tr
+                    th
+                    th
+                    th
+                    th
+                    th 共 件
+                    th 共 元
+    #cashierSubmit.mdui-card.mdui-m-t-2.mdui-m-b-1
+        .mdui-card-actions.mdui-p-a-2
+            .mdui-textfield
+                i.mdui-icon.material-icons &#xe8f7;
+                lable.mdui-textfield-label 会员卡号
+                input.mdui-textfield-input(type="text" name="GID" pattern="^[0-9]*$" placeholder="若无留空" maxlength=10)
+            button.mdui-btn.mdui-ripple#checkBtn 结账

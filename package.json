@@ -1,11 +1,12 @@
 {
+  "homepage": "https://github.com/Jas0n2k/database_exp",
   "name": "db-exp",
   "version": "0.0.0",
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
     "dev": "export NODE_ENV=dev NODE_DEBUG=dev && nodemon ./bin/www || exit 0",
-    "dev-win": "SET NODE_ENV=dev && nodemon ./bin/www"
+    "dev-win": "SET NODE_ENV=dev&& nodemon ./bin/www"
   },
   "dependencies": {
     "better-sqlite3": "^7.1.2",

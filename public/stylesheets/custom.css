@@ -30,3 +30,8 @@
     margin: 0;
     padding: 0;
 }
+
+.aboutLink {
+    text-decoration: none;
+    color: black
+}

@@ -2,15 +2,13 @@ $().ready(() => {
     let searchParams = new URLSearchParams(window.location.search);
 
     if (searchParams.has('dm')) {
-        mdui.dialog({
-            title: '需要登录',
-            content:'该操作需要您先登录',
-            buttons: [
-                {text: '好的',
-                close:true}]
+        mdui.alert('该操作需要您先登录', '需要登录', function () {
+        }, {
+            confirmText: '好的',
+            modal: true,
+            history: false
         })
     }
-
     const form = $('#loginForm')
 
     const itemName = {
@@ -35,6 +33,7 @@ $().ready(() => {
             let p = $.post('/api/login', info, function (data) {
                 if (data.res) {
                     mdui.dialog({
+                        history: false,
                         title: '登录成功',
                         closeOnEsc: false,
                         modal: true,
@@ -51,6 +50,7 @@ $().ready(() => {
                     })
                 } else {
                     mdui.dialog({
+                        history: false,
                         title: '登录失败',
                         content: '请检查账号信息',
                         buttons: [
@@ -61,6 +61,7 @@ $().ready(() => {
             })
                 .fail(function () {
                     mdui.dialog({
+                        history: false,
                         title: '网络错误',
                         content: '请检查网络连接',
                         buttons: [
@@ -78,6 +79,7 @@ $().ready(() => {
             let p = $.post('/api/adminLogin', info, function (data) {
                 if (data.res) {
                     mdui.dialog({
+                        history: false,
                         title: '登录成功',
                         closeOnEsc: false,
                         modal: true,
@@ -94,6 +96,7 @@ $().ready(() => {
                     })
                 } else {
                     mdui.dialog({
+                        history: false,
                         title: '登录失败',
                         content: '请检查账号信息',
                         buttons: [
@@ -104,6 +107,7 @@ $().ready(() => {
             })
                 .fail(function () {
                     mdui.dialog({
+                        history: false,
                         title: '网络错误',
                         content: '请检查网络连接',
                         buttons: [

@@ -1,23 +1,9 @@
 const router = require('express').Router();
-// const postfix = ' - 超市会员管理系统'
-const session = require('express-session');
-
-router.use(session({
-    secret: 'ECUPL',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: false,
-        sameSite: true
-    }
-}))
 
 const redirectHome = (req, res, next) => {
     if (req.session.adminUserID) {
-        console.log("has adminUserID")
         return res.redirect('/dashboard');
     } else if (req.session.userID) {
-        console.log("has userID")
         return res.redirect('/')
     } else {
         next();
@@ -26,44 +12,68 @@ const redirectHome = (req, res, next) => {
 
 const redirectLogin = (req, res, next) => {
     if (!req.session.adminUserID && !req.session.userID) {
-        console.log('User is not logged in.')
-        return res.redirect('/login?dm=1');
+        res.redirect('/login?dm=1');
     } else next();
 }
 
+const redirectIfNotAdmin = (req, res, next) => {
+    if (!!req.session.adminUserID || req.app.get('env') === 'dev') {
+        next();
+    } else {
+        if (!!req.session.userID) {
+            let err = new Error('需要管理员权限');
+            err.status = 401;
+            err.name = "Unauthorized";
+            next(err);
+        } else {
+            res.redirect('/');
+        }
+    }
+}
+/*
+ A middleware to render title and some variables.
+*/
 const renderEle = (req, res, next) => {
     res.locals = {
-        postfix: ' - 超市会员管理系统',
-        isLogin: req.session.userID ? true : false,
-        isAdminLogin: req.session.adminUserID ? true : false
+        isLogin: !!req.session.userID,
+        isAdminLogin: !!req.session.adminUserID,
+        adminLevel: (!!req.session.adminLevel) ? req.session.adminLevel : 0,
+        username: (!!req.session.username) ? req.session.username : ''
     };
     next();
 }
+router.use(renderEle);
 
-router.get('/', renderEle, function (req, res, next) {
-    res.render('index', {
-        title: '首页',
 
-    });
+router.get('/', (req, res) => {
+    res.render('index', {title: '首页',});
 });
 
-router.get('/login', redirectHome, renderEle, (req, res, next) => {
+router.get('/login', redirectHome, (req, res) => {
     res.render('login', {title: '登录'});
-    res.end();
 })
 
-router.get('/register', redirectHome, renderEle, (req, res, next) => {
+router.get('/register', redirectHome, (req, res) => {
     res.render('register', {title: '注册'});
-    res.end();
 })
 
-router.get('/about', renderEle, (req, res) => {
+router.get('/about', (req, res) => {
     res.render('about', {title: '关于'});
-    res.end();
 })
 
-router.get('/dashboard', redirectLogin, renderEle, ((req, res) => {
+router.get('/dashboard', redirectLogin, ((req, res) => {
     res.send('You\'re in!')
 }))
+
+router.get('/cashier', redirectIfNotAdmin, (req, res, next) => {
+    res.render('cashier', {title: '收银'});
+})
+
+/*
+    If the request misses all middlewares above, or an error are thrown.
+ */
+
+// catch 404 and forward to error handler
+
 
 module.exports = router;

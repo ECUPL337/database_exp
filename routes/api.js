@@ -1,104 +1,139 @@
+/*
+ API Router File
+ Path: /api
+*/
+
 const router = require('express').Router();
 const db = require('../db/db');
-const session = require('express-session');
 
-router.use(session({
-    name: 'sid',
-    secret: 'ECUPL',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: false,
-        // maxAge: max_cookie_life,
-        sameSite: true // 'strict'
+/*
+    Middleware.
+ */
+
+const rejectEmptyPost = (req, res, next) => {
+    if (Object.keys(req.body).length === 0) {
+        console.log(req.ip);
+        res.status(400).send({
+            res: false,
+            errType: "EMPTY_REQ",
+        });
+    } else next();
+}
+
+const authenticateAdminLoggedIn = (req, res, next) => {
+    if (!!req.session.adminUserID) {
+        next();
+    } else {
+        res.send({
+            res: false,
+            errMsg: "UNAUTHORIZED"
+        })
+        res.status(401).end();
     }
-}))
+}
+
+const authenticateLoggedIn = (req, res, next) => {
+    if (!!req.session.adminUserID || !!req.session.userID) {
+        next();
+    } else {
+        res.send({
+            res: false,
+            errMsg: '您还未登录',
+            errType: 'UNAUTHORIZED'
+        });
+        res.status(401).end();
+    }
+}
+
+
+/*
+    Redirect all GET requests to index.
+ */
 
 router.get('/*', ((req, res) => {
     res.redirect('/');
 }))
 
-router.post('/register', async (req, res) => {
-    if (Object.keys(req.body).length === 0) {
-        res.send({
-            res: false,
-            errType: "EMPTY"
-        });
-    } else res.send(db.DB_register(req.body));
+
+router.post('/logout', authenticateLoggedIn, (req, res) => {
+    req.session.destroy(function (err) {
+        if (err) {
+            return res.send({
+                res: false,
+                errMsg: '退出失败，请重试'
+            })
+        }
+        res.clearCookie('sid');
+        return res.send({
+            res: true
+        })
+    });
+
+})
+
+router.use(rejectEmptyPost);
+
+router.post('/register', (req, res) => {
+    res.send(db.DB_register(req.body));
 });
 
 
-router.post('/adminLogin', async (req, res, next) => {
-    if (req.body) {
-        const dbRes = db.DB_adminLogin(req.body)
-        if (dbRes) {
-            req.session.adminUserID = dbRes.ID;
-            res.send({
-                res: true,
-                errMsg: "登录成功",
-                adminUsername: dbRes.Login
-            });
+router.post('/adminLogin', (req, res) => {
+    const dbRes = db.DB_adminLogin(req.body)
+    if (dbRes) {
+        req.session.adminLevel = dbRes.Level;
+        req.session.adminUserID = dbRes.ID;
+        req.session.userName = dbRes.Login
 
-        } else res.send({
-            res: false,
-            errMsg: "登录信息错误",
-            dbRes: dbRes
-
+        res.send({
+            res: true,
+            errMsg: "登录成功",
+            adminUsername: dbRes.Login
         });
     } else res.send({
         res: false,
-        errMsg: "参数错误"
+        errMsg: "登录信息错误",
+        dbRes: dbRes
     });
 })
 
 router.post('/login', async (req, res) => {
-    if (req.body) {
-        const dbRes = db.DB_login({
-            username: req.body.username,
-            password: req.body.password
-        })
+    const dbRes = db.DB_login(req.body);
+    if (dbRes) {
+        req.session.userID = dbRes.CID;
+        req.session.userName = dbRes.CName;
 
-        if (dbRes) {
-            req.session.userID = dbRes.CID;
-            req.session.CName = dbRes.CName;
-            res.send({
-                res: true,
-                errMsg: "登录成功",
-                CName: dbRes.CName
-            });
-
-        } else res.send({
-            res: false,
-            errMsg: "登录信息错误",
-            dbRes: dbRes
-
+        res.send({
+            res: true,
+            errMsg: "登录成功",
+            CName: dbRes.CName
         });
     } else res.send({
         res: false,
-        errMsg: "参数错误"
+        errMsg: "登录信息错误",
+        dbRes: dbRes
     });
+
 })
 
-router.post('/logout', (req, res) => {
-
-    if (!req.session.adminUserID && !req.session.userID) {
-        return res.send({
-            logout: false,
-            errMsg: '您还未登录'
-        });
-    } else {
-        req.session.destroy(function (err) {
-            if (err) {
-                return res.send({
-                    logout: false,
-                    errMsg: '退出失败，请重试'
-                })
-            }
-            res.clearCookie('sid');
-            return res.send({
-                logout: true
-            })
-        });
+router.post('/purchase', authenticateAdminLoggedIn, (req, res) => {
+    // const dbRes = db.DB_purchase(req.body);
+    let items = {
+        CID: 'customerID',
+        GID: 'goodID',
+        PAmount: 'amount',
+        PMoney: 'moneySum',
     }
+    let c = {};
+    c['PTime'] = String(Date.now());
+    Object.keys(items).some(key => {
+        if (!!req.body[items[key]]) {
+            c[key] = req.body[items[key]];
+            return true;
+        } else return true;
+    });
+    console.log(c)
 })
+
+
 module.exports = router;
