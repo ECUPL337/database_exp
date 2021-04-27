@@ -1,38 +1,34 @@
 $().ready(() => {
     const form = $('#regForm');
     const itemName = {
-        'username': '用户名',
-        'password': '密码',
-        'phone': '手机号',
-        'workplace': '单位',
-        'name': '姓名',
-        'birthday': '生日'
+        'CLogin': '用户名',
+        'CPassword': '密码',
+        'CPhone': '手机号',
+        'CWork': '单位',
+        'CName': '姓名',
+        'CBirthday': '生日'
     }
 
     const errType = {
         "UNIQUE": "已被注册",
-        "NOTNULL":"为空"
+        "NOTNULL": "为空"
     }
 
     const reportValid = function () {
         form.find('input').each(function () {
-            console.log(this.validity)
-            if (this.validity.valueMissing) {
-                this.setCustomValidity(
-                    itemName[`${$(this).attr('name')}`] + '不能为空'
-                )
-            } else if (this.validity.patternMismatch) {
-                this.setCustomValidity((itemName[`${$(this).attr('name')}`]) + '只能为英文数字');
-            } else
-                this.setCustomValidity('');
+            if (this.validity.valueMissing) this.setCustomValidity(itemName[`${$(this).attr('name')}`] + '不能为空');
+            else if (this.validity.tooShort) this.setCustomValidity((itemName[`${$(this).attr('name')}`]) + '太短');
+            else if (this.validity.patternMismatch) this.setCustomValidity((itemName[`${$(this).attr('name')}`]) + '只能为英文数字');
+            else this.setCustomValidity('');
         })
         form[0].reportValidity();
     }
 
-    $('#regBtn').click(function (){
+    $('#regBtn').click(function () {
         if (form[0].checkValidity()) {
             let info = form.serializeArray();
             let p = $.post('/api/register', info, function (data) {
+                console.log(data);
                 if (data.res) {
                     mdui.dialog({
                         title: '注册成功!',
@@ -50,7 +46,7 @@ $().ready(() => {
                             },
                             {
                                 text: '返回首页',
-                                close:false,
+                                close: false,
                                 onClick: () => {
                                     window.location.href = '/';
                                 }
@@ -62,7 +58,7 @@ $().ready(() => {
                         modal: true,
                         title: '注册失败',
                         history: false,
-                        content: itemName[data.errItem] + errType[data.errType],
+                        content: itemName[data.errColumn] + errType[data.errType],
                         buttons: [
                             {
                                 text: '好的',
@@ -86,7 +82,7 @@ $().ready(() => {
         } else reportValid();
     })
 
-    $('#resetBtn').click(()=>{
+    $('#resetBtn').click(() => {
         mdui.dialog({
             history: false,
             title: "操作确认",

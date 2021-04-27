@@ -3,7 +3,7 @@
  * Global Variable
  */
 const {
-    default_port = 80,
+    default_port = 10086,
     max_cookie_life = 60000, // 10 Minutes
 } = process.env;
 
@@ -91,7 +91,7 @@ function onListening() {
     let addr = server.address();
     let bind = typeof addr === 'string'
         ? 'pipe ' + addr
-        : 'port ' + addr.port;
+        : addr.address + ':' + addr.port;
     debuglog('Listening on ' + bind);
 }
 

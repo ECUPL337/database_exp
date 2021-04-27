@@ -13,6 +13,7 @@ $().ready(function () {
         dashboard: '/dashboard',
         cashier: '/cashier'
     }
+
     drawerItem.each(function () {
         if (!!render[this.id]) {
             $(this).click(() => {
@@ -20,8 +21,10 @@ $().ready(function () {
             })
         }
     })
-    if ($('#logout')) {
-        $('#logout').click(function () {
+
+    const logOutBtn = $('#logout')
+    if (logOutBtn.length) {
+        logOutBtn.click(function () {
             // inst.close();
             $.post('/api/logout', function (data) {
                 if (data.res) {
@@ -53,18 +56,6 @@ $().ready(function () {
                     })
                 }
             })
-            // mdui.dialog({
-            //     title: '退出登录',
-            //     content: '您确定要退出吗？',
-            //     buttons: [{
-            //         text: "取消",
-            //     }, {
-            //         text: "确定",
-            //         onClick: () => {
-            //
-            //         }
-            //     }]
-            // })
         })
     }
 })

@@ -10,42 +10,38 @@ const db = require('../db/db');
     Middleware.
  */
 
-const rejectEmptyPost = (req, res, next) => {
-    if (Object.keys(req.body).length === 0) {
-        console.log(req.ip);
-        res.status(400).send({
-            res: false,
-            errType: "EMPTY_REQ",
-        });
-    } else next();
-}
-
 const authenticateAdminLoggedIn = (req, res, next) => {
-    if (!!req.session.adminUserID) {
-        next();
-    } else {
-        res.send({
+    if (!req.session.adminUserID && req.app.get('env') !== 'dev') {
+        res.status(401).json({
             res: false,
             errMsg: "UNAUTHORIZED"
-        })
-        res.status(401).end();
-    }
+        }).end();
+    } else next();
 }
 
 const authenticateLoggedIn = (req, res, next) => {
     if (!!req.session.adminUserID || !!req.session.userID) {
         next();
     } else {
-        res.send({
+        res.status(401).json({
             res: false,
-            errMsg: '您还未登录',
             errType: 'UNAUTHORIZED'
-        });
-        res.status(401).end();
+        }).end();
     }
 }
 
+const rejectEmptyReq = (req, res, next) => {
+    if (Object.keys(req.body).length === 0) {
+        console.log(req.ip);
+        res.status(400);
+    } else next();
+}
 
+
+const GeneralErrHandler = e => new Promise(resolve => {
+    console.log(e);
+    return e.message;
+})
 /*
     Redirect all GET requests to index.
  */
@@ -55,85 +51,73 @@ router.get('/*', ((req, res) => {
 }))
 
 
+/*
+    API Routers.
+ */
 router.post('/logout', authenticateLoggedIn, (req, res) => {
     req.session.destroy(function (err) {
         if (err) {
-            return res.send({
+            return res.status(403).send({
                 res: false,
                 errMsg: '退出失败，请重试'
-            })
+            }).end();
         }
         res.clearCookie('sid');
-        return res.send({
+        return res.json({
             res: true
+        }).end();
+    });
+
+})
+
+/*
+    APIs that accept data.
+ */
+router.use(rejectEmptyReq);
+router.post('/register', async (req, res) => {
+    db.DB_registerPromise(req.body)
+        .then(() => res.json({res: true}))
+        .catch(e => db.SQL_RestraintErrHandler(e))
+        .then(msg => res.json(msg).end())
+        .catch(e => {
+            console.log(e);
+            res.status(500);
         })
-    });
-
-})
-
-router.use(rejectEmptyPost);
-
-router.post('/register', (req, res) => {
-    res.send(db.DB_register(req.body));
 });
-
-
-router.post('/adminLogin', (req, res) => {
-    const dbRes = db.DB_adminLogin(req.body)
-    if (dbRes) {
-        req.session.adminLevel = dbRes.Level;
-        req.session.adminUserID = dbRes.ID;
-        req.session.userName = dbRes.Login
-
-        res.send({
-            res: true,
-            errMsg: "登录成功",
-            adminUsername: dbRes.Login
-        });
-    } else res.send({
-        res: false,
-        errMsg: "登录信息错误",
-        dbRes: dbRes
-    });
-})
-
 router.post('/login', async (req, res) => {
-    const dbRes = db.DB_login(req.body);
-    if (dbRes) {
-        req.session.userID = dbRes.CID;
-        req.session.userName = dbRes.CName;
-
-        res.send({
-            res: true,
-            errMsg: "登录成功",
-            CName: dbRes.CName
-        });
-    } else res.send({
-        res: false,
-        errMsg: "登录信息错误",
-        dbRes: dbRes
-    });
-
+    db.DB_login(req.body).then(DBRes => {
+        req.session.username = DBRes.username;
+        if (DBRes.type === 0) {
+            req.session.adminLevel = DBRes.adminLevel;
+            req.session.adminUserID = DBRes.adminUserID;
+        }
+        if (DBRes.type === 1) {
+            req.session.userID = DBRes.userID;
+        }
+        res.json(DBRes)
+    })
+        .catch(e => res.send(db.SQL_RestraintErrHandler(e)).end())
 })
 
-router.post('/purchase', authenticateAdminLoggedIn, (req, res) => {
-    // const dbRes = db.DB_purchase(req.body);
-    let items = {
-        CID: 'customerID',
-        GID: 'goodID',
-        PAmount: 'amount',
-        PMoney: 'moneySum',
-    }
-    let c = {};
-    c['PTime'] = String(Date.now());
-    Object.keys(items).some(key => {
-        if (!!req.body[items[key]]) {
-            c[key] = req.body[items[key]];
-            return true;
-        } else return true;
-    });
-    console.log(c)
+/*
+    APIs that need Admin authority.
+ */
+router.use(authenticateAdminLoggedIn);
+
+router.post('/purchase', async (req, res) => {
+    if (req.body.form.length < 1) return res.status(400).end();
+    return db.DB_purchase(req.body)
+        .then(DBRes => res.json(DBRes).end())
+        .catch(e => res.json(db.SQL_RestraintErrHandler(e)).end())
+        .catch(e => res.status(500).json(db.SQL_OtherErrHandler(e)).end())
 })
 
+router.post('/queryGood', async (req, res) => {
+    if (isNaN(req.body.GID)) return res.status(400).end();
+    db.DB_queryGoodPromise(req.body.GID)
+        .then(DBRes => res.json(DBRes).end())
+        .catch(e => res.json(db.SQL_RestraintErrHandler(e)).end())
+        .catch(e => res.status(500).json(db.SQL_OtherErrHandler(e)).end())
+})
 
 module.exports = router;

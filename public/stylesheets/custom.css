@@ -1,3 +1,4 @@
+/*noinspection ALL*/
 .mdui-drawer {
     display: flex;
     flex-direction: column;
@@ -7,6 +8,7 @@
     flex: 1;
 }
 
+/*noinspection CssUnusedSymbol*/
 .copyright {
     color: rgba(0, 0, 0, .38);
     margin: 10px 0;

@@ -21,7 +21,7 @@ const redirectIfNotAdmin = (req, res, next) => {
         next();
     } else {
         if (!!req.session.userID) {
-            let err = new Error('需要管理员权限');
+            let err = new Error('权限不足');
             err.status = 401;
             err.name = "Unauthorized";
             next(err);
@@ -65,8 +65,8 @@ router.get('/dashboard', redirectLogin, ((req, res) => {
     res.send('You\'re in!')
 }))
 
-router.get('/cashier', redirectIfNotAdmin, (req, res, next) => {
-    res.render('cashier', {title: '收银'});
+router.get('/cashier', redirectIfNotAdmin, (req, res) => {
+    res.render('cashier', {title: '收银台'});
 })
 
 /*

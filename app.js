@@ -30,15 +30,15 @@ app.use(express.urlencoded({extended: true}));
 app.use('/api', apiRouter);
 app.use('/', indexRouter);
 
-app.use(function (req, res, next) {
+app.use(function (req, res) {
     let err = new Error('页面未找到');
     err.status = 404;
     err.name = "Not Found"
-    next(err);
+    throw err;
 });
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use((err, req, res, next) => {
     // set locals, only providing error details in dev environment.
     res.locals.message = err.message || '服务器内部错误';
     res.locals.error = req.app.get('env') === 'dev' ? err : {};

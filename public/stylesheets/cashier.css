@@ -1,8 +1,5 @@
 .quan {
     display: flex;
-    /*Default:
-    flex-flow: row nowrap;
-    */
     justify-content: space-between;
     align-items: flex-end;
     padding: 16px 0;
@@ -21,6 +18,29 @@
 
 .btnEmbedded .mdui-btn {
     min-width: 50px;
-    padding: 0px;
-    margin: 4px 0px;
+    padding: 0;
+    margin: 4px 0;
+}
+
+.mdui-table td:first-child, .mdui-table th:first-child {
+    padding-left: 8px;
+}
+
+.mdui-table td:nth-child(2), .mdui-table th:nth-child(2) {
+    padding-left: 6px;
+}
+
+
+.mdui-table td:last-child, .mdui-table th:last-child {
+    padding-right: 8px;
+}
+
+.mdui-table td, .mdui-table th {
+    padding: 8px 6px;
+    text-align: center;
+}
+
+.spinnerContainer {
+    text-align: center;
+    margin: 10px 0;
 }
