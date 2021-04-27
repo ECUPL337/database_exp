@@ -4,7 +4,6 @@
  */
 const {
     default_port = 10086,
-    max_cookie_life = 60000, // 10 Minutes
 } = process.env;
 
 /**

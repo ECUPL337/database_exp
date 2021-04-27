@@ -3,24 +3,29 @@ const path = require('path');
 const fs = require('fs')
 
 const db_path = path.join(__dirname, 'Supermarket.db');
+console.log(db_path);
 const db = new Database(db_path, {verbose: console.log, fileMustExist: false});
+
+/*
+    If the database does not exist, create one.
+
+*/
+try {
+    const getTable = db.prepare(`SELECT name FROM sqlite_master where type IS 'table' ORDER BY name`).get();
+    console.log(getTable);
+}
+catch (e) {
+    console.log(e.message)
+    console.log('.db File does not exist. Create one.')
+    const createDB = fs.readFileSync(path.join(__dirname, 'create.sql'), 'utf8');
+    db.exec(createDB);
+}
 
 /*
     Terminate the database connection when main programme quits.
  */
 
 process.on('exit', () => db.close());
-
-/*
-    If the database does not exist, create one.
-
-*/
-// const getTable = db.prepare(`SELECT name FROM sqlite_master where type IS 'table' ORDER BY name`).get();
-if (!fs.existsSync(db_path)) {
-    console.log('.db File does not exist. Create one.')
-    const createDB = fs.readFileSync(path.join(__dirname, 'create.sql'), 'utf8');
-    db.exec(createDB);
-}
 
 const SQL_RestraintErrHandler = e => {
     console.log("SQL_RestraintErrHandler: " + e.message);
@@ -88,9 +93,9 @@ const DB_login = form => new Promise(resolve => {
     Pre-handle data got from the database, and return error messages.
  */
 
-const register = db.prepare("INSERT INTO Customer (CLogin, CPassword, CPhone, CBirthday, CWork, CRegDate, CName) VALUES (@CLogin, @CPassword, @CPhone, @CBirthday, @CWork, @CRegDate, @CName)");
 
 const DB_registerPromise = form => {
+    const register = db.prepare("INSERT INTO Customer (CLogin, CPassword, CPhone, CBirthday, CWork, CRegDate, CName) VALUES (@CLogin, @CPassword, @CPhone, @CBirthday, @CWork, @CRegDate, @CName)");
     let c = form;
     c['CRegDate'] = String(Date.now())
     // Object.keys(items).forEach(key => c[key] = form[items[key]]);
@@ -157,8 +162,8 @@ const DB_purchase = req => new Promise(resolve => {
 /*
     Query Info of Goods.
  */
-const queryGood = db.prepare("SELECT GName, GPrice FROM Goods WHERE GID = @GID");
 const DB_queryGoodPromise = GoodID => new Promise(resolve => {
+    const queryGood = db.prepare("SELECT GName, GPrice FROM Goods WHERE GID = @GID");
     let msg = {};
     let DBRes = queryGood.get({GID: GoodID});
     msg.res = true;

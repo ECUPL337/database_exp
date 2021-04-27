@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "dev": "export NODE_ENV=dev NODE_DEBUG=dev && nodemon ./bin/www || exit 0",
+    "dev": "export NODE_ENV=dev NODE_DEBUG=dev PORT=10085 && nodemon ./bin/www || exit 0",
     "dev-win": "SET NODE_ENV=dev&& SET NODE_DEBUG=dev&& SET PORT=10085&& nodemon ./bin/www"
   },
   "dependencies": {
