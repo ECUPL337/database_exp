@@ -17,7 +17,7 @@ try {
 catch (e) {
     console.log(e.message)
     console.log('.db File does not exist. Create one.')
-    const createDB = fs.readFileSync(path.join(__dirname, 'create.sql'), 'utf8');
+    const createDB = fs.readFileSync(path.join(__dirname, 'Supermarket.db.sql'), 'utf8');
     db.exec(createDB);
 }
 
