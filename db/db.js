@@ -11,14 +11,15 @@ const db = new Database(db_path, {verbose: console.log, fileMustExist: false});
 
 */
 try {
-    const getTable = db.prepare(`SELECT name FROM sqlite_master where type IS 'table' ORDER BY name`).get();
+    const getTable = db.prepare(`SELECT *
+                                 FROM Admin`).get();
     console.log(getTable);
 }
 catch (e) {
     console.log(e.message)
     console.log('.db File does not exist. Create one.')
-    const createDB = fs.readFileSync(path.join(__dirname, 'Supermarket.db.sql'), 'utf8');
-    db.exec(createDB);
+    const createDBSQL = fs.readFileSync(path.join(__dirname, 'Supermarket.db.sql'), 'utf8');
+    db.exec(createDBSQL);
 }
 
 /*
@@ -85,7 +86,6 @@ const DB_login = form => new Promise(resolve => {
             break;
         default:
             throw new Error("SYNTAX ERROR", "Login type is wrong.");
-            break;
     }
 })
 
@@ -172,6 +172,7 @@ const DB_queryGoodPromise = GoodID => new Promise(resolve => {
         msg.goodName = DBRes.GName;
         msg.goodPrice = DBRes.GPrice;
     }
+    console.log(msg);
     resolve(msg);
 })
 

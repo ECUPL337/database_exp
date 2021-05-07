@@ -11,7 +11,8 @@ const db = require('../db/db');
  */
 
 const authenticateAdminLoggedIn = (req, res, next) => {
-    if (!req.session.adminUserID && req.app.get('env') !== 'dev') {
+    if (!req.session.adminUserID && (req.app.get('env') !== 'dev')) {
+        console.log("UNAUTHORIZED");
         res.status(401).json({
             res: false,
             errMsg: "UNAUTHORIZED"
@@ -54,6 +55,7 @@ router.get('/*', ((req, res) => {
 /*
     API Routers.
  */
+
 router.post('/logout', authenticateLoggedIn, (req, res) => {
     req.session.destroy(function (err) {
         if (err) {
@@ -74,6 +76,7 @@ router.post('/logout', authenticateLoggedIn, (req, res) => {
     APIs that accept data.
  */
 router.use(rejectEmptyReq);
+
 router.post('/register', async (req, res) => {
     db.DB_registerPromise(req.body)
         .then(() => res.json({res: true}))
@@ -119,5 +122,6 @@ router.post('/queryGood', async (req, res) => {
         .catch(e => res.json(db.SQL_RestraintErrHandler(e)).end())
         .catch(e => res.status(500).json(db.SQL_OtherErrHandler(e)).end())
 })
+
 
 module.exports = router;

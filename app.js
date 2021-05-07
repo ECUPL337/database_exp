@@ -30,7 +30,7 @@ app.use(express.urlencoded({extended: true}));
 app.use('/api', apiRouter);
 app.use('/', indexRouter);
 
-app.use(function (req, res) {
+app.use((req, res) => {
     let err = new Error('页面未找到');
     err.status = 404;
     err.name = "Not Found"

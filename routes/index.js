@@ -33,7 +33,7 @@ const redirectIfNotAdmin = (req, res, next) => {
 /*
  A middleware to render title and some variables.
 */
-const renderEle = (req, res, next) => {
+router.use((req, res, next) => {
     res.locals = {
         isLogin: !!req.session.userID,
         isAdminLogin: !!req.session.adminUserID,
@@ -41,8 +41,7 @@ const renderEle = (req, res, next) => {
         username: (!!req.session.username) ? req.session.username : ''
     };
     next();
-}
-router.use(renderEle);
+});
 
 
 router.get('/', (req, res) => {

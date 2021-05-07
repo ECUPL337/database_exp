@@ -27,7 +27,7 @@ $().ready(() => {
     $('#regBtn').click(function () {
         if (form[0].checkValidity()) {
             let info = form.serializeArray();
-            let p = $.post('/api/register', info, function (data) {
+            $.post('/api/register', info, function (data) {
                 console.log(data);
                 if (data.res) {
                     mdui.dialog({

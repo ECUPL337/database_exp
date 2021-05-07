@@ -4,9 +4,57 @@ $().ready(() => {
     const goodTable = $('#goodTable');
     const goodTableFoot = $('#goodTableFoot');
     const addForm = $('#addForm');
-    const progressBar = $("#progress");
+    const progressCircle = $("#progressCircle");
+    const progressBar = $("#progressBar");
     const form = new Map();
 
+    const preventNaNInput = e => {
+        if (e.keyCode < 48 || e.keyCode > 57) e.preventDefault()
+    }
+
+    const DefaultKeyListener = e => {
+        switch (e.key) {
+            case "q":
+                quantity.focus();
+                break;
+            case "a":
+                e.preventDefault();
+                $('#addBtn').click();
+                break;
+            case "Tab":
+                e.preventDefault();
+                $('#GID').focus();
+                break;
+            case "r":
+                resetBtn.click();
+                break;
+            case "e":
+                $('#member').focus();
+                break;
+            case "c":
+                break;
+            case "Enter":
+                $('#checkoutBtn').click();
+                break;
+            case "d":
+                $('#removeGood').click();
+                break;
+            default:
+                break;
+        }
+    };
+
+    const DialogKeyListener = e => {
+        switch (e.key) {
+            case "Enter":
+                const confirmBtn = $(".checkoutConfirmDialog").find(".mdui-dialog-actions").children().eq(1);
+                console.log(confirmBtn);
+                confirmBtn[0].click();
+                break;
+            default:
+                break;
+        }
+    }
     const fetchTimeout = (url, options, timeout = 5000) => {
         return Promise.race([fetch(url, options), new Promise((_, reject) => {
             setTimeout(() => {
@@ -14,12 +62,12 @@ $().ready(() => {
             }, timeout);
         })])
     }
+
     const renderTableFoot = function () {
         let totalItem = goodTable[0].rows.length;
         if (!totalItem) {
             goodTableFoot.hide();
         } else {
-            goodTableFoot.show();
             let quanSum = 0, moneySum = 0.0;
             $('tr.item').each(function () {
                 let $this = $(this);
@@ -32,9 +80,8 @@ $().ready(() => {
             goodTableFoot.show();
         }
     }
-    const preventNaNInput = function (e) {
-        if (e.keyCode < 48 || e.keyCode > 57) e.preventDefault();
-    };
+
+
     const appendGoods = req => {
         if (!req.GID || !req.quantity) {
             mdui.snackbar({
@@ -59,7 +106,7 @@ $().ready(() => {
                     position: "right-top"
                 })
             } else {
-                progressBar.show();
+                progressCircle.show();
                 fetchTimeout("/api/queryGood", {
                     method: "POST",
                     headers: {
@@ -71,8 +118,8 @@ $().ready(() => {
                     if (!res.ok) throw Error(res.statusText);
                     return res.json();
                 }).then(resJson => {
-                    if (resJson.existed) {
-                        progressBar.hide();
+                    if (resJson.goodExists) {
+                        progressCircle.hide();
                         form.set(Number(req.GID), Number(req.quantity))
                         goodTable.append(`<tr class="item" id="item${req.GID}"> <th>${req.GID}</th> <th>${resJson.goodName}</th> <th class="GPrice">${(resJson.goodPrice).toFixed(2)}</th> <th class="GQuan">${req.quantity}</th> <th class="GSum">${(resJson.goodPrice * Number(req.quantity)).toFixed(2)}</th></tr>`);
                         renderTableFoot();
@@ -85,40 +132,41 @@ $().ready(() => {
                         throw Error("Not Exist");
                     }
                 }).catch(e => {
-                    let msgText;
+                    let msg;
                     switch (e.message) {
                         case "Unauthorized": {
-                            msgText = "您没有权限查询";
+                            msg = "无权查询，请重新登录";
                             break;
                         }
                         case "Not Exist": {
-                            msgText = "商品不存在";
+                            msg = "商品不存在";
                             break;
                         }
                         case "Not Found": {
-                            msgText = "API消失了！";
+                            msg = "API消失了！";
                             break;
                         }
                         case "Request Timeout":
                         case "Failed to fetch": {
-                            msgText = "网络错误";
+                            msg = "网络错误";
                             break;
                         }
                         default: {
-                            msgText = "发生了未知错误";
+                            msg = "发生了未知错误";
                             break;
                         }
                     }
                     mdui.snackbar({
-                        message: msgText,
+                        message: msg,
                         timeout: 800,
                         position: "right-top",
-                        onClose: () => progressBar.hide()
+                        onClose: () => progressCircle.hide()
                     });
                 })
             }
         }
     }
+
     const removeGood = req => {
         if (!req.GID || !req.quantity) {
             mdui.snackbar({
@@ -149,6 +197,7 @@ $().ready(() => {
             }
         }
     }
+
     const resetGood = () => {
         resetBtn.click();
         form.clear();
@@ -156,82 +205,108 @@ $().ready(() => {
         goodTableFoot.empty()
     }
     const checkout = () => {
-        let memberID = $("#member").val();
-        let req = {
-            form: Array.from(form),
-            memberID: memberID
-        };
-
-        fetchTimeout("/api/purchase", {
-            method: "POST",
-            headers: {
-                "Content-Type": 'application/json;charset=utf-8'
+        mdui.dialog(({
+            title: "确定要结账吗？",
+            history: false,
+            modal: true,
+            cssClass: "checkoutConfirmDialog",
+            onOpen: () => {
+                $(document).unbind("keydown");
+                $(document).keydown(e => DialogKeyListener(e));
             },
-            body: JSON.stringify(req),
-            cache: "no-cache"
-        }, 5000)
-            .then(res => {
-                if (!res.ok) throw Error(res.statusText);
-                return res.json();
-            })
-            .then(json => {
-                console.log(json)
-                if (json.res) {
-                    if (json.memberExists) {
-                        resetGood();
-                        let postfix = (json.credit !== undefined) ? "，当前会员积分为 " + json.credit : "";
-                        mdui.dialog({
-                            title: '结账成功',
-                            content: "消费金额为 " + json.sum + " 元" + postfix,
-                            buttons: [
-                                {
-                                    text: '继续 (ESC)',
-                                    onClose: () => {
-                                        $('#GID').focus();
+            onClose: () => {
+                $(document).unbind("keydown");
+                $(document).keydown(e => DefaultKeyListener(e));
+            },
+            buttons: [
+                {
+                    text: "取消 (Esc)"
+                },
+                {
+                    text: "确定 (Enter)",
+                    bold: true,
+                    onClick: () => {
+                        progressBar.show();
+                        let memberID = $("#member").val();
+                        let req = {
+                            form: Array.from(form),
+                            memberID: memberID
+                        };
+                        fetchTimeout("/api/purchase", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": 'application/json;charset=utf-8'
+                            },
+                            body: JSON.stringify(req),
+                            cache: "no-cache"
+                        }, 5000)
+                            .then(res => {
+                                if (!res.ok) throw Error(res.statusText);
+                                return res.json();
+                            })
+                            .then(json => {
+                                if (json.res) {
+                                    if (json.memberExists) {
+                                        resetGood();
+                                        progressBar.hide();
+                                        let postfix = (json.credit !== undefined) ? "，当前会员积分为 " + json.credit : "";
+                                        mdui.dialog({
+                                            title: '结账成功',
+                                            content: "消费金额为 " + json.sum + " 元" + postfix,
+                                            buttons: [
+                                                {
+                                                    text: '继续 (ESC)',
+                                                    onClose: () => {
+                                                        $('#GID').focus();
+                                                    }
+                                                }
+                                            ],
+                                            history: false,
+                                            overlay: true,
+                                            modal: true,
+                                        })
                                     }
                                 }
-                            ],
-                            history: false,
-                            overlay: true,
-                            modal: true,
-                        })
+                            })
+                            .catch(e => {
+                                console.log(e.message);
+                                let msg;
+                                switch (e.message) {
+                                    case "Unauthorized":
+                                        msg = "无权查询，请重新登录";
+                                        break;
+                                    case "Bad Request":
+                                        msg = "请求有误";
+                                        break;
+                                    case "Internal Server Error":
+                                        msg = "服务器内部错误";
+                                        break;
+                                    default:
+                                        msg = "其他错误";
+                                        break;
+                                }
+                                mdui.dialog({
+                                    title: "错误",
+                                    content: msg,
+                                    history: false,
+                                    buttons: [
+                                        {
+                                            text: "关闭 (ESC)",
+                                        }
+                                    ],
+                                    onClose: () => {
+                                        progressBar.hide();
+                                    }
+                                })
+                            })
                     }
                 }
-            })
+            ],
+        }))
 
     }
 
-    $(document).keydown(e => {
-        switch (e.key) {
-            case "q":
-                quantity.focus();
-                break;
-            case "a":
-                e.preventDefault();
-                $('#addBtn').click();
-                break;
-            case "Tab":
-                e.preventDefault();
-                $('#GID').focus();
-                break;
-            case "r":
-                resetBtn.click();
-                break;
-            case "e":
-                $('#member').focus();
-                break;
-            case "c":
-                break;
-            case "Enter":
-                $('#checkoutBtn').click();
-                break;
-            case "d":
-                $('#removeGood').click();
-                break;
-            default:
-                break;
-        }
-    });
+    $(document).keydown(e => DefaultKeyListener(e));
 
     $("#GID, #quantity, #member").on("keypress", preventNaNInput);
 

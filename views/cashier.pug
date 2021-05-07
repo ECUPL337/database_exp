@@ -16,6 +16,8 @@ html(lang="zh-cmn-Hans")
                 a.mdui-btn.mdui-btn.mdui-btn-icon.mdui-ripple#homeBtn(onclick="window.location.href = '/'")
                     i.mdui-icon.material-icons home
                 a.mdui-headline.mdui-typo-title #{title}
+        .mdui-progress#progressBar(style="display:none")
+            .mdui-progress-indeterminate
         .mdui-container-fluid
             #wrapper.mdui-row
                 #cashierDiv.mdui-col-xs-12.mdui-col-sm-6.mdui-col-md-4
@@ -62,6 +64,6 @@ html(lang="zh-cmn-Hans")
                                 th
                                 th#quanSum
                                 th#moneySum
-                    .spinnerContainer#progress(style="display:none")
+                    .spinnerContainer#progressCircle(style="display:none")
                         .mdui-spinner.mdui-spinner-colorful
     script(src="/statics/javascript/cashier.js")
