@@ -58,7 +58,7 @@ $().ready(() => {
     const fetchTimeout = (url, options, timeout = 5000) => {
         return Promise.race([fetch(url, options), new Promise((_, reject) => {
             setTimeout(() => {
-                reject(new Error("Request Timeout", timeout));
+                reject(new Error("Request Timeout"));
             }, timeout);
         })])
     }
@@ -84,7 +84,7 @@ $().ready(() => {
 
     const appendGoods = req => {
         if (!req.GID || !req.quantity) {
-            mdui.snackbar({
+             mdui.snackbar({
                 message: "不能为空",
                 timeout: 800,
                 position: "left-top"

@@ -1,0 +1,29 @@
+.card {
+
+}
+
+.cardFaceImg {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    height: 200px;
+    width: auto;
+    overflow: hidden;
+    padding-right: 10px;
+}
+
+.cardFaceImg > img {
+    height: 80%;
+    width: fit-content !important;
+    transition: all 0.3s ease-in-out;
+}
+
+.cardFaceImg > img:hover {
+    height: 130%;
+}
+
+.mdui-card-primary > div, .mdui-card-actions > button {
+    color: black;
+}

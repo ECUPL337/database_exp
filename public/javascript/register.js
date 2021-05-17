@@ -34,7 +34,7 @@ $().ready(() => {
                         title: '注册成功!',
                         closeOnEsc: false,
                         modal: true,
-                        content: '欢迎您，' + data.CName,
+                        content: '欢迎您，' + data.username,
                         history: false,
                         buttons: [
                             {

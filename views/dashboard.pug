@@ -1,0 +1,20 @@
+extends mdui
+append head
+    link(rel="stylesheet" href="/statics/stylesheets/dashboard.css")
+mixin card(card_content)
+    .mdui-col-xs-12.mdui-col-md-6.mdui-col-lg-4.mdui-m-b-3
+        .mdui-card
+            .mdui-card-media
+                .cardFaceImg
+                    img(src= card_content.iconPath)
+                .mdui-card-media-covered.mdui-card-media-covered-transparent
+                    .mdui-card-primary
+                        .mdui-card-primary-title #{card_content.title}
+                        .mdui-card-primary-subtitle #{card_content.desc}
+                    .mdui-card-actions
+                        button.mdui-btn.mdui-ripple(onclick= "window.location.href=\'" + card_content.path + "\'") 打开
+
+block content
+    .mdui-row.mdui-m-t-5
+    each card in cardFaces
+        +card(card)

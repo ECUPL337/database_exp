@@ -11,7 +11,9 @@ $().ready(function () {
         register: '/register',
         about: '/about',
         dashboard: '/dashboard',
-        cashier: '/cashier'
+        cashier: '/cashier',
+        redeem: '/redeem',
+        history: '/history'
     }
 
     drawerItem.each(function () {

@@ -37,3 +37,45 @@
     text-decoration: none;
     color: black
 }
+
+.mdui-container {
+    margin-top: 15px;
+}
+
+.enterArea {
+    display: flex;
+    flex-flow: nowrap row;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+
+}
+
+.enterArea > .mdui-textfield {
+    width: 60%;
+    margin-right: 10px;
+}
+
+.enterArea > button {
+    margin-left: 10px !important;
+}
+
+.typeTableArea {
+    margin: 10px auto;
+    width: 40vw;
+}
+
+.typeTableArea th {
+    text-align: center !important;
+}
+
+.noData {
+    text-align: center;
+    margin: 10px auto;
+    color: gray;
+}
+
+.bottomLoadingIndicator{
+    margin: 10px auto;
+    text-align: center;
+}

@@ -102,7 +102,10 @@ const DB_registerPromise = form => {
     return new Promise((resolve, reject) => {
         try {
             register.run(c);
-            resolve();
+            resolve({
+                res: true,
+                username: c.CName
+            });
         } catch (e) {
             reject(e);
         }
@@ -176,6 +179,19 @@ const DB_queryGoodPromise = GoodID => new Promise(resolve => {
     resolve(msg);
 })
 
+const DB_queryType = offset => new Promise( resolve => {
+    const queryType = db.prepare("SELECT * FROM GoodsType ORDER BY TID LIMIT ?,3")
+    let dbRes = queryType.all(offset);
+    setTimeout( () =>     resolve({
+        res: true,
+        dbRes: dbRes
+    }), 1000);
+})
+
+
+const DB_insertType = type => new Promise(resolve =>{
+    const insertType = db.prepare("INSERT INTO GoodsType(TName) VALUES(?)")
+})
 
 module.exports = {
     DB_login,
@@ -184,4 +200,5 @@ module.exports = {
     SQL_RestraintErrHandler,
     SQL_OtherErrHandler,
     DB_queryGoodPromise,
+    DB_queryType,
 };

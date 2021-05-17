@@ -1,0 +1,25 @@
+extends mdui
+
+block content
+    .enterArea
+        .mdui-textfield
+            lable.mdui-textfield-label 种类名称
+            input.mdui-textfield-input#typeName(type="text" maxlength=10)
+        button.mdui-btn.mdui-btn-icon.mdui-ripple.mdui-color-blue-accent#refreshBtn
+            i.mdui-icon.material-icons refresh
+        button.mdui-btn.mdui-btn-icon.mdui-ripple.mdui-color-blue-accent#addBtn
+            i.mdui-icon.material-icons add
+    .typeTableArea(style="display:none")
+        table.mdui-table.mdui-table-hoverable
+            thead
+                tr
+                    th #
+                    th 种类名称
+            tbody#dataRender
+    .noData(style="display:none")
+        p 暂无种类数据
+    .bottomLoadingIndicator
+        .mdui-spinner.mdui-spinner-colorful
+
+append end
+    script(src="/statics/javascript/typeManagement.js")

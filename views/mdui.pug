@@ -20,22 +20,28 @@ html(lang="zh-cmn-Hans")
         .mdui-drawer#drawerContainer
             block drawer
                 ul.mdui-list#drawer
+                    if isDev
+                        li.mdui-subheader-inset 测试环境
                     li.mdui-list-item.mdui-ripple#home
                         i.mdui-list-item-icon.mdui-icon.material-icons &#xe88a
                         .mdui-list-item-content 首页
-                    li.mdui-list-item.mdui-ripple#cashier
-                        i.mdui-list-item-icon.mdui-icon.material-icons &#xe227
-                        .mdui-list-item-content 收银
                     li.mdui-divider
-                    if isLogin
-                        li.mdui-list-item.mdui-ripple#record
+                    if isLogin || isDev
+                        if isDev
+                            li.mdui-subheader-inset 会员功能
+                        li.mdui-list-item.mdui-ripple#history
                             i.mdui-list-item-icon.mdui-icon.material-icons &#xe890
                             .mdui-list-item-content 消费记录
                         li.mdui-list-item.mdui-ripple#redeem
                             i.mdui-list-item-icon.mdui-icon.material-icons &#xe7fe
                             .mdui-list-item-content 积分兑换
-                    else if isAdminLogin
-                        if adminLevel > 1
+                    if isAdminLogin || isDev
+                        if isDev
+                            li.mdui-subheader-inset 管理员功能
+                        li.mdui-list-item.mdui-ripple#cashier
+                            i.mdui-list-item-icon.mdui-icon.material-icons &#xe227
+                            .mdui-list-item-content 收银
+                        if adminLevel > 1 || isDev
                             li.mdui-list-item.mdui-ripple#dashboard
                                 i.mdui-list-item-icon.mdui-icon.material-icons &#xe871
                                 .mdui-list-item-content Dashboard

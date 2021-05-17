@@ -1,3 +1,5 @@
+// noinspection JSUnresolvedVariable
+
 /*
  API Router File
  Path: /api
@@ -10,7 +12,7 @@ const db = require('../db/db');
     Middleware.
  */
 
-const authenticateAdminLoggedIn = (req, res, next) => {
+const authenticateAdminLoggedIn = async (req, res, next) => {
     if (!req.session.adminUserID && (req.app.get('env') !== 'dev')) {
         console.log("UNAUTHORIZED");
         res.status(401).json({
@@ -20,8 +22,8 @@ const authenticateAdminLoggedIn = (req, res, next) => {
     } else next();
 }
 
-const authenticateLoggedIn = (req, res, next) => {
-    if (!!req.session.adminUserID || !!req.session.userID) {
+const authenticateLoggedIn = async (req, res, next) => {
+    if (!!req.session.adminUserID || !!req.session.userID ||(req.app.get('env') === 'dev') ) {
         next();
     } else {
         res.status(401).json({
@@ -31,18 +33,16 @@ const authenticateLoggedIn = (req, res, next) => {
     }
 }
 
-const rejectEmptyReq = (req, res, next) => {
-    if (Object.keys(req.body).length === 0) {
+const rejectEmptyReq = async (req, res, next) => {
+    if (Object.keys(req.body).length === 0 || Object.values(req.body).some(e => (e.length === 0))) {
         console.log(req.ip);
-        res.status(400);
+        res.status(400).json({
+            res: false,
+            errType: "EMPTY_REQ"
+        }).end();
     } else next();
 }
 
-
-const GeneralErrHandler = e => new Promise(resolve => {
-    console.log(e);
-    return e.message;
-})
 /*
     Redirect all GET requests to index.
  */
@@ -79,13 +79,9 @@ router.use(rejectEmptyReq);
 
 router.post('/register', async (req, res) => {
     db.DB_registerPromise(req.body)
-        .then(() => res.json({res: true}))
-        .catch(e => db.SQL_RestraintErrHandler(e))
-        .then(msg => res.json(msg).end())
-        .catch(e => {
-            console.log(e);
-            res.status(500);
-        })
+        .then(dbRes => res.json(dbRes).end())
+        .catch(e => res.json(db.SQL_RestraintErrHandler(e)).end())
+        .catch(e => res.status(500).json(db.SQL_OtherErrHandler(e)).end())
 });
 router.post('/login', async (req, res) => {
     db.DB_login(req.body).then(DBRes => {
@@ -108,8 +104,15 @@ router.post('/login', async (req, res) => {
 router.use(authenticateAdminLoggedIn);
 
 router.post('/purchase', async (req, res) => {
-    if (req.body.form.length < 1) return res.status(400).end();
-    return db.DB_purchase(req.body)
+    return await db.DB_purchase(req.body)
+        .then(DBRes => res.json(DBRes).end())
+        .catch(e => res.json(db.SQL_RestraintErrHandler(e)).end())
+        .catch(e => res.status(500).json(db.SQL_OtherErrHandler(e)).end())
+})
+
+router.post('/queryType', async (req,res) => {
+    if (isNaN(req.body.offset)) return res.code(400).end();
+    return await db.DB_queryType(parseInt(req.body.offset))
         .then(DBRes => res.json(DBRes).end())
         .catch(e => res.json(db.SQL_RestraintErrHandler(e)).end())
         .catch(e => res.status(500).json(db.SQL_OtherErrHandler(e)).end())
