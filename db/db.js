@@ -11,8 +11,7 @@ const db = new Database(db_path, {verbose: console.log, fileMustExist: false});
 
 */
 try {
-    const getTable = db.prepare(`SELECT *
-                                 FROM Admin`).get();
+    const getTable = db.prepare("SELECT * FROM Admin").get();
     console.log(getTable);
 }
 catch (e) {
@@ -142,7 +141,7 @@ const purchases_GUEST = db.transaction((form, timestamp) => {
 
 const DB_purchase = req => new Promise(resolve => {
     const querySum = db.prepare("SELECT SUM(PMoney) AS moneySum FROM Purchase WHERE PTime = ?")
-    const queryCredit = db.prepare("SELECT CCredit AS Creadit FROM Customer WHERE CID = ?");
+    const queryCredit = db.prepare("SELECT CCredit AS Credit FROM Customer WHERE CID = ?");
     const queryMemberExist = db.prepare("SELECT CName FROM Customer WHERE CID = ?")
     const timestamp = String(Date.now());
     let res = {
@@ -157,7 +156,7 @@ const DB_purchase = req => new Promise(resolve => {
             return resolve(res);
         }
         purchases(req.form, req.memberID, timestamp);
-        res.credit = queryCredit.get(req.memberID).Creadit.toFixed(2);
+        res.credit = queryCredit.get(req.memberID).Credit.toFixed(2);
     }
     res.sum = querySum.get(timestamp).moneySum.toFixed(2);
     return resolve(res)
@@ -190,7 +189,8 @@ const DB_queryType = offset => new Promise( resolve => {
 
 
 const DB_insertType = type => new Promise(resolve =>{
-    const insertType = db.prepare("INSERT INTO GoodsType(TName) VALUES(?)")
+    const insertType = db.prepare("INSERT INTO GoodsType(TName) VALUES(?)");
+
 })
 
 module.exports = {
@@ -201,4 +201,5 @@ module.exports = {
     SQL_OtherErrHandler,
     DB_queryGoodPromise,
     DB_queryType,
+    DB_insertType
 };

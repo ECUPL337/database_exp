@@ -3,3 +3,4 @@
 *.http
 package-lock.json
 rest-client.env.json
+/db/Supermarket.db

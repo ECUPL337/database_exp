@@ -5,9 +5,9 @@ block content
         .mdui-textfield
             lable.mdui-textfield-label 种类名称
             input.mdui-textfield-input#typeName(type="text" maxlength=10)
-        button.mdui-btn.mdui-btn-icon.mdui-ripple.mdui-color-blue-accent#refreshBtn
+        button.mdui-btn.mdui-btn-icon.mdui-ripple.mdui-color-blue-accent#refreshBtn(mdui-tooltip="{content:'重置'}")
             i.mdui-icon.material-icons refresh
-        button.mdui-btn.mdui-btn-icon.mdui-ripple.mdui-color-blue-accent#addBtn
+        button.mdui-btn.mdui-btn-icon.mdui-ripple.mdui-color-blue-accent#addBtn(mdui-tooltip="{content:'添加'}")
             i.mdui-icon.material-icons add
     .typeTableArea(style="display:none")
         table.mdui-table.mdui-table-hoverable
