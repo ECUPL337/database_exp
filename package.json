@@ -7,8 +7,9 @@
     "start": "export NODE_ENV=production PORT=10085 && node ./bin/www",
     "start-win": "SET NODE_ENV=production&& node ./bin/www",
     "dev": "export NODE_ENV=dev NODE_DEBUG=dev PORT=10085 && nodemon ./bin/www || exit 0",
-    "dev-win": "SET NODE_ENV=dev&& SET NODE_DEBUG=dev&& SET PORT=10085&& nodemon ./bin/www"
+    "dev-win": "SET NODE_ENV=dev&& SET NODE_DEBUG=dev&& SET PORT=10085&& start http://localhost:10085&& nodemon ./bin/www"
   },
+  "author": "Jason",
   "dependencies": {
     "better-sqlite3": "^7.1.2",
     "body-parser": "^1.19.0",

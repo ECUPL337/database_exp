@@ -3,18 +3,15 @@ const path = require('path');
 const fs = require('fs')
 
 const db_path = path.join(__dirname, 'Supermarket.db');
-console.log(db_path);
 const db = new Database(db_path, {verbose: console.log, fileMustExist: false});
 
 /*
     If the database does not exist, create one.
-
 */
 try {
     const getTable = db.prepare("SELECT * FROM Admin").get();
     console.log(getTable);
-}
-catch (e) {
+} catch (e) {
     console.log(e.message)
     console.log('.db File does not exist. Create one.')
     const createDBSQL = fs.readFileSync(path.join(__dirname, 'Supermarket.db.sql'), 'utf8');
@@ -178,20 +175,61 @@ const DB_queryGoodPromise = GoodID => new Promise(resolve => {
     resolve(msg);
 })
 
-const DB_queryType = offset => new Promise( resolve => {
-    const queryType = db.prepare("SELECT * FROM GoodsType ORDER BY TID LIMIT ?,3")
-    let dbRes = queryType.all(offset);
-    setTimeout( () =>     resolve({
+const DB_queryType = (NumberPerPage, PageNumber) => new Promise(resolve => {
+    const queryType = db.prepare("SELECT * FROM GoodsType ORDER BY TID ASC LIMIT $NumberPerPage OFFSET (($PageNumber - 1) * $NumberPerPage)")
+    let dbRes = queryType.all({
+        NumberPerPage: parseInt(NumberPerPage, 10),
+        PageNumber: parseInt(PageNumber, 10)
+    });
+    resolve({
         res: true,
         dbRes: dbRes
-    }), 1000);
+    })
+})
+
+const DB_queryTypeCount = () => new Promise(resolve => {
+    const queryTypeCount = db.prepare("SELECT COUNT(*) AS TypeCount FROM GoodsType");
+    let dbRes = queryTypeCount.get();
+    resolve({
+        res: true,
+        dbRes: dbRes
+    })
 })
 
 
-const DB_insertType = type => new Promise(resolve =>{
-    const insertType = db.prepare("INSERT INTO GoodsType(TName) VALUES(?)");
-
+const DB_appendType = type => new Promise((resolve, reject) => {
+    const appendType = db.prepare("INSERT INTO GoodsType(TName) VALUES(?)");
+    const info = appendType.run(type);
+    console.log(info);
+    if (info.changes === 1) {
+        resolve({
+            res: true
+        })
+    } else reject(info)
 })
+
+const DB_editType = ({TID, TName = ""}) => new Promise(resolve => {
+    let dbRes;
+    if (TName.length < 1) {
+        const queryTNameByTID = db.prepare(`SELECT TName FROM GoodsType WHERE TID = (?)`);
+        dbRes = queryTNameByTID.get(TID);
+
+    } else {
+        const updateTName = db.prepare(`UPDATE GoodsType SET TName = $TName WHERE TID = $TID`);
+        dbRes = updateTName.get(TID)
+    }
+    resolve({
+        res: true,
+        dbRes: dbRes,
+    })
+})
+
+const DB_removeType = ({TID}) => new Promise((resolve => {
+    const removeType = db.prepare(`DELETE FROM GoodsType WHERE TID = (?)`);
+    const dbRes = removeType.run(TID);
+    if (dbRes.changes === 1) resolve({res: true});
+    else resolve({res: false})
+}))
 
 module.exports = {
     DB_login,
@@ -201,5 +239,8 @@ module.exports = {
     SQL_OtherErrHandler,
     DB_queryGoodPromise,
     DB_queryType,
-    DB_insertType
+    DB_queryTypeCount,
+    DB_appendType,
+    DB_editType,
+    DB_removeType
 };

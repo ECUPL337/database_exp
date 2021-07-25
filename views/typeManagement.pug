@@ -1,25 +1,59 @@
 extends mdui
 
 block content
-    .enterArea
-        .mdui-textfield
-            lable.mdui-textfield-label 种类名称
-            input.mdui-textfield-input#typeName(type="text" maxlength=10)
-        button.mdui-btn.mdui-btn-icon.mdui-ripple.mdui-color-blue-accent#refreshBtn(mdui-tooltip="{content:'重置'}")
-            i.mdui-icon.material-icons refresh
-        button.mdui-btn.mdui-btn-icon.mdui-ripple.mdui-color-blue-accent#addBtn(mdui-tooltip="{content:'添加'}")
-            i.mdui-icon.material-icons add
-    .typeTableArea(style="display:none")
-        table.mdui-table.mdui-table-hoverable
-            thead
-                tr
-                    th #
-                    th 种类名称
-            tbody#dataRender
-    .noData(style="display:none")
-        p 暂无种类数据
-    .bottomLoadingIndicator
-        .mdui-spinner.mdui-spinner-colorful
+    .mdui-dialog#editDialog
+        .mdui-dialog-title 编辑种类名称
+        .mdui-dialog-content
+            .mdui-spinner#TNameEditDialogIndicator
+            label.mdui-textfield-label#TNameEditDialogLabel(for="TNameEditDialogInput")
+            input.mdui-textfield-input#TNameEditDialogInput(type="text")
+        .mdui-dialog-actions
+            button.mdui-btn.mdui-ripple(mdui-dialog-cancel) 取消
+            button.mdui-btn.mdui-ripple#editDialogConfirmBtn(mdui-dialog-confirm) 确定
+    .fullPageWrapper
+        .enterArea
+            .mdui-textfield
+                lable.mdui-textfield-label 种类名称
+                input.mdui-textfield-input#typeName(type="text" maxlength=10)
+            button.mdui-btn.mdui-btn-icon.mdui-ripple.mdui-color-blue-accent#resetBtn(mdui-tooltip="{content:'重置'}")
+                i.mdui-icon.material-icons refresh
+            button.mdui-btn.mdui-btn-icon.mdui-ripple.mdui-color-blue-accent#addBtn(mdui-tooltip="{content:'添加'}")
+                i.mdui-icon.material-icons add
+        .tableArea(style="display:none")
+            table.mdui-table.mdui-table-hoverable
+                thead
+                    tr
+                        th #
+                        th 种类名称
+                        th 操作
+                tbody#tableDataRender
+                tfoot
+                    tr
+                        th(colspan=3)
+                            .displayPerPage
+                                span 共有
+                                b#typeCount 0
+                                span 条记录，每页显示
+                                select.mdui-select
+                                    option(value=10 selected) 10
+                                    option(value=20) 20
+                                    option(value=50) 50
+                                span 条记录
+                            .pagination
+                                button#preBtn <
+                                span 第
+                                input(type="number" min=1)
+                                span 页
+                                button#goBtn Go
+                                button#nextBtn >
+
+        .noData(style="display:none")
+            p 暂无种类数据
+        .bottomLoadingIndicator
+            .mdui-spinner-circle.mdui-spinnner-colorful
+        .bottomLoadingRetry(style="display:none")
+            p 网络错误
+            button.mdui-btn.mdui-ripple.mdui-color-blue-accent#retryBtn 重试
 
 append end
     script(src="/statics/javascript/typeManagement.js")

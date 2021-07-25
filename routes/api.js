@@ -23,7 +23,7 @@ const authenticateAdminLoggedIn = async (req, res, next) => {
 }
 
 const authenticateLoggedIn = async (req, res, next) => {
-    if (!!req.session.adminUserID || !!req.session.userID ||(req.app.get('env') === 'dev') ) {
+    if (!!req.session.adminUserID || !!req.session.userID || (req.app.get('env') === 'dev')) {
         next();
     } else {
         res.status(401).json({
@@ -72,6 +72,13 @@ router.post('/logout', authenticateLoggedIn, (req, res) => {
 
 })
 
+router.post('/queryTypeCount', async (req, res) => {
+    return await db.DB_queryTypeCount()
+        .then(DBRes => res.json(DBRes))
+        .catch(e => res.status(500).json(db.SQL_OtherErrHandler(e)))
+        .finally(() => res.end())
+})
+
 /*
     APIs that accept data.
  */
@@ -95,7 +102,7 @@ router.post('/login', async (req, res) => {
         }
         res.json(DBRes)
     })
-        .catch(e => res.send(db.SQL_RestraintErrHandler(e)).end())
+        .catch(e => res.json(db.SQL_RestraintErrHandler(e)).end())
 })
 
 /*
@@ -110,17 +117,48 @@ router.post('/purchase', async (req, res) => {
         .catch(e => res.status(500).json(db.SQL_OtherErrHandler(e)).end())
 })
 
-router.post('/queryType', async (req,res) => {
-    if (isNaN(req.body.offset)) return res.code(400).end();
-    return await db.DB_queryType(parseInt(req.body.offset))
+router.post('/queryType', async (req, res) => {
+    if (Number.isNaN(req.body.NumberPerPage) || Number.isNaN(req.body.PageNumber)) return res.code(400).end();
+    return await db.DB_queryType(req.body.NumberPerPage, req.body.PageNumber)
         .then(DBRes => res.json(DBRes).end())
         .catch(e => res.json(db.SQL_RestraintErrHandler(e)).end())
         .catch(e => res.status(500).json(db.SQL_OtherErrHandler(e)).end())
 })
 
+
+router.post('/appendType', async (req, res,) => {
+    console.log(req.body);
+    return await db.DB_appendType(req.body.typeName)
+        .then(DBRes => res.json(DBRes))
+        .catch(e => res.json(db.SQL_RestraintErrHandler(e)))
+        .catch(e => res.json(db.SQL_OtherErrHandler(e)))
+        .finally(() => res.end())
+})
+
 router.post('/queryGood', async (req, res) => {
     if (isNaN(req.body.GID)) return res.status(400).end();
     db.DB_queryGoodPromise(req.body.GID)
+        .then(DBRes => res.json(DBRes).end())
+        .catch(e => res.json(db.SQL_RestraintErrHandler(e)).end())
+        .catch(e => res.status(500).json(db.SQL_OtherErrHandler(e)).end())
+})
+
+router.post('/editType', async (req, res) => {
+    if (isNaN(req.body.TID)) return res.status(400).end();
+    db.DB_editType({
+        TID: req.body.TID,
+        TName: req.body.TName
+    })
+        .then(DBRes => res.json(DBRes).end())
+        .catch(e => res.json(db.SQL_RestraintErrHandler(e)).end())
+        .catch(e => res.status(500).json(db.SQL_OtherErrHandler(e)).end())
+})
+
+router.post('/removeType', async (req, res) => {
+    if (isNaN(req.body.TID)) return res.status(400).end();
+    db.DB_removeType({
+        TID: req.body.TID
+    })
         .then(DBRes => res.json(DBRes).end())
         .catch(e => res.json(db.SQL_RestraintErrHandler(e)).end())
         .catch(e => res.status(500).json(db.SQL_OtherErrHandler(e)).end())

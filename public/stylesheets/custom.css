@@ -9,7 +9,7 @@
 
 .copyright {
     color: rgba(0, 0, 0, .38);
-    margin:10px 0 ;
+    margin: 10px 0;
     padding: 0 10px;
     text-align: left;
     overflow: hidden;
@@ -36,16 +36,26 @@
     color: black
 }
 
-.mdui-container {
-    margin-top: 15px;
+.fullPageWrapper {
+    width: 100%;
+    height: calc(100vh - 56px);
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: start;
 }
 
+@media screen and (min-width: 600px) {
+    .fullPageWrapper{
+    height: calc(100vh - 64px);
+}}
+
 .enterArea {
+    width: 100%;
     display: flex;
     flex-flow: nowrap row;
     justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
+    margin: 0 auto 10px;
 }
 
 .enterArea > .mdui-textfield {
@@ -57,13 +67,49 @@
     margin-left: 10px !important;
 }
 
-.typeTableArea {
-    margin: 10px auto;
-    width: 40vw;
+.tableArea {
+    margin-bottom: 8px;
+    overflow: scroll;
+    min-width: 80%;
+    flex-grow: 1;
+    table-layout: fixed;
 }
 
-.typeTableArea th {
+.tableArea::-webkit-scrollbar {
+    width: 0 !important
+}
+
+.tableArea table {
+    width: 100%;
+    border-spacing: 0;
+    word-break: keep-all;
+}
+
+.tableArea th, .tableArea td {
     text-align: center !important;
+}
+
+.tableArea thead th, .tableArea tfoot th {
+    position: sticky;
+    z-index: 2;
+}
+
+.tableArea thead th {
+    background: #e2e2e2;
+    top: 0;
+}
+
+.tableArea tfoot th {
+    background: white;
+    position: sticky;
+    border-top:1px inset rgba(169,169,169,0.6);
+    bottom: 0;
+}
+
+.tableArea tbody td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
 }
 
 .noData {
@@ -72,7 +118,41 @@
     color: gray;
 }
 
-.bottomLoadingIndicator{
+.bottomLoadingIndicator, .bottomLoadingRetry, .bottomIndicator {
     margin: 10px auto;
     text-align: center;
+}
+
+.bottomIndicator {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.displayPerPage {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.displayPerPage > b, .displayPerPage > select {
+    font-weight: 500;
+    margin: 0 5px;
+}
+
+.pagination {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination > input {
+    width: 60px;
+    border: gray solid 1px;
+    border-radius: 5px;
+}
+
+.delDialog .mdui-dialog-actions a:last-child {
+    color: red;
 }
