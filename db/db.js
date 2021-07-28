@@ -176,7 +176,7 @@ const DB_queryGoodPromise = GoodID => new Promise(resolve => {
 })
 
 const DB_queryType = (NumberPerPage, PageNumber) => new Promise(resolve => {
-    const queryType = db.prepare("SELECT * FROM GoodsType ORDER BY TID ASC LIMIT $NumberPerPage OFFSET (($PageNumber - 1) * $NumberPerPage)")
+    const queryType = db.prepare("SELECT * FROM GoodsType ORDER BY TID LIMIT $NumberPerPage OFFSET (($PageNumber - 1) * $NumberPerPage)")
     let dbRes = queryType.all({
         NumberPerPage: parseInt(NumberPerPage, 10),
         PageNumber: parseInt(PageNumber, 10)
@@ -216,7 +216,10 @@ const DB_editType = ({TID, TName = ""}) => new Promise(resolve => {
 
     } else {
         const updateTName = db.prepare(`UPDATE GoodsType SET TName = $TName WHERE TID = $TID`);
-        dbRes = updateTName.get(TID)
+        dbRes = updateTName.run({
+            TID: TID,
+            TName: TName
+        })
     }
     resolve({
         res: true,

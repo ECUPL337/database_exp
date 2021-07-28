@@ -6,7 +6,7 @@ block content
         .mdui-dialog-content
             .mdui-spinner#TNameEditDialogIndicator
             label.mdui-textfield-label#TNameEditDialogLabel(for="TNameEditDialogInput")
-            input.mdui-textfield-input#TNameEditDialogInput(type="text")
+            input.mdui-textfield-input#TNameEditDialogInput(type="text" required)
         .mdui-dialog-actions
             button.mdui-btn.mdui-ripple(mdui-dialog-cancel) 取消
             button.mdui-btn.mdui-ripple#editDialogConfirmBtn(mdui-dialog-confirm) 确定
@@ -56,4 +56,5 @@ block content
             button.mdui-btn.mdui-ripple.mdui-color-blue-accent#retryBtn 重试
 
 append end
-    script(src="/statics/javascript/typeManagement.js")
+    script(src="/statics/javascript/public.js")
+    script(src="/statics/javascript/typeManagement.js" defer)

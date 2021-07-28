@@ -1,17 +1,4 @@
-const fetchWithTimeout = (url, options, timeout = 5000) => new Promise((resolve, reject) => {
-    const controller = new AbortController();
-    const timer = ms => new Promise(() => setTimeout(() => controller.abort(), ms));
-    const res = fetch(url, {
-        ...options,
-        signal: controller.signal
-    });
-    Promise.race([timer(timeout), res])
-        .then(res => resolve(res))
-        .catch(e => {
-            if (e.name === "AbortError") reject(new Error('Request Timeout'));
-            else reject(e);
-        })
-})
+$TNameEditDialogInput = $("#TNameEditDialogInput");
 
 const resErrorHandler = res => {
     if (!res.ok) {
@@ -70,7 +57,7 @@ const renderTypeList = (NumberPerPage, PageNumber) => {
             } else {
                 for (let element of json.dbRes) {
                     $("#tableDataRender")
-                        .append(`<tr><td>${element.TID}</td><td>${element.TName}</td><td><button id="${element.TID}EditBtn" class="mdui-btn mdui-btn-icon mdui-ripple" onclick="editType(this)"><i class="mdui-icon material-icons">&#xe3c9;</i></button><button id="${element.TID}DelBtn" class="mdui-btn mdui-btn-icon mdui-ripple" onclick="delType(this)"><i class="mdui-icon material-icons">&#xe872;</i></button></td></tr>`)
+                        .append(`<tr><td>${element.TID}</td><td>${element.TName}</td><td><button id="${element.TID}EditBtn" class="mdui-btn mdui-btn-icon mdui-ripple" mdui-tooltip="{content:'编辑名称'}" onclick="editType(this)"><i class="mdui-icon material-icons">&#xe3c9;</i></button><button id="${element.TID}DelBtn" class="mdui-btn mdui-btn-icon mdui-ripple" mdui-tooltip="{content:'删除'}" onclick="delType(this)"><i class="mdui-icon material-icons">&#xe872;</i></button></td></tr>`)
                 }
                 $(".tableArea").show();
             }
@@ -129,7 +116,10 @@ const appendType = () => {
             }
             $("#typeName").val("");
             $("#retryBtn").click();
-
+            mdui.snackbar(`\"${typeName}\"添加成功`, {
+                timeout: 1500,
+                position: "top"
+            })
         })
         .catch(e => reqErrorHandler(e))
         .finally(() => {
@@ -164,23 +154,6 @@ const editType = e => {
             $("#TNameEditDialogIndicator").hide();
             initEditDialog.handleUpdate();
         })
-    $("#editDialogConfirmBtn").on("click", () => {
-        let newTName = $("#TNameEditDialogInput").value();
-        if(newTName.length < 1 && newTName === TName) {
-            console.log(newTName);
-        }
-        fetchWithTimeout("/api/editType", {
-            method: "POST",
-            headers: {
-                "Content-Type": 'application/json;charset=utf-8'
-            },
-            body: JSON.stringify({
-                TID: TID,
-                TName:TName
-            }),
-            cache: "no-cache"
-        }, 3000)
-    })
 }
 
 const delType = e => {
@@ -245,14 +218,18 @@ const delType = e => {
         )
         .then(res => resErrorHandler(res))
         .then(json => {
-            console.log(json);
-            mdui.alert("", "删除成功", () => {
-                renderTypeList(numberPerPage, pageNum);
-                queryTypeCount();
-            }, {
-                modal: true,
-                history: false
-            })
+            if (json.res) {
+                mdui.snackbar("删除成功", {
+                    position: "top",
+                    timeout: 1500,
+                    onOpen: () => {
+                        renderTypeList(numberPerPage, pageNum);
+                        queryTypeCount();
+                    }
+                })
+            } else {
+                throw new Error("内部错误")
+            }
         })
         .catch(e => {
             let errMsg = "未知错误，详情为：" + e.message;
@@ -284,6 +261,46 @@ $("#resetBtn").click(() => $("#typeName").val(""))
 
 $("#addBtn").click(() => appendType()
 )
+
+document.getElementById("editDialog").addEventListener("confirm.mdui.dialog",
+    () => {
+        let newTName = $TNameEditDialogInput[0].value;
+        let oldTName = $TNameEditDialogInput[0].placeholder;
+        let TID = $("#TNameEditDialogLabel").text().slice(5);
+        if (!$TNameEditDialogInput[0].checkValidity()) {
+            mdui.snackbar("不能为空", {
+                position: "top",
+                timeout: 1500
+            })
+        } else if (newTName === oldTName) {
+            mdui.snackbar("名称与原来相同", {
+                position: "top",
+                timeout: 1500
+            })
+
+        } else {
+            fetchWithTimeout("/api/editType", {
+                method: "POST",
+                headers: {
+                    "Content-Type": 'application/json;charset=utf-8'
+                },
+                body: JSON.stringify({
+                    TID: TID,
+                    TName: newTName
+                }),
+                cache: "no-cache"
+            }, 3000)
+                .then(res => resErrorHandler(res))
+                .then(json => {
+                    if (json.res) {
+                        mdui.snackbar("名称修改成功", {
+                            timeout: 1500,
+                            position: "top"
+                        })
+                    }
+                })
+        }
+    })
 
 
 $(() => {
