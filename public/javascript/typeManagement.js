@@ -1,19 +1,9 @@
-const fetchWithTimeout = (url, options, timeout = 5000) => new Promise((resolve, reject) => {
-    const controller = new AbortController();
-    const timer = ms => new Promise(() => setTimeout(() => controller.abort(), ms));
-    const res = fetch(url, {
-        ...options,
-        signal: controller.signal
-    });
-    Promise.race([timer(timeout), res])
-        .then(res => resolve(res))
-        .catch(e => {
-            if (e.name === "AbortError") reject(new Error('Request Timeout'));
-            else reject(e);
-        })
-})
+const $TNameEditDialogInput = $("#TNameEditDialogInput");
+const $typeName = $("#typeName");
+const $rowPerPage = $("#rowPerPage");
+const $pageNumberInput = $("#pageNumberInput");
 
-const resErrorHandler = res => {
+function resErrorHandler(res) {
     if (!res.ok) {
         let customError = new Error(res.statusText)
         customError.code = res.status
@@ -45,21 +35,33 @@ const reqErrorHandler = e => {
     });
 }
 
-let numberPerPage = 10;
-let pageNum = 1;
+function tableRowWrapper(TID, TName) {
+    return `<tr><td>${TID}</td><td>${TName}</td><td><button id="${TID}EditBtn" class="mdui-btn mdui-btn-icon mdui-ripple" mdui-tooltip="{content:'编辑名称'}" onclick="editType(this)"><i class="mdui-icon material-icons">&#xe3c9;</i></button><button id="${TID}DelBtn" class="mdui-btn mdui-btn-icon mdui-ripple" mdui-tooltip="{content:'删除'}" onclick="delType(this)"><i class="mdui-icon material-icons">&#xe872;</i></button></td></tr>`
+}
 
-const renderTypeList = (NumberPerPage, PageNumber) => {
+async function renderTypeList(RowPerPage = "10", PageNumber = "1") {
+    if (!localStorage.getItem("rowPerPage")) {
+        localStorage.setItem("rowPerPage", RowPerPage);
+    }
+    if (!localStorage.getItem("PageNumber")) {
+        localStorage.setItem("pageNumber", PageNumber)
+    }
+    let int_rowPerPage = parseInt(RowPerPage);
+    let int_pageNumber = parseInt(PageNumber);
+    $rowPerPage.val(int_rowPerPage);
+    $pageNumberInput.val(int_pageNumber);
     $("#tableDataRender").empty();
     $(".bottomLoadingIndicator").show();
     $(".noData, .tableArea, .bottomLoadingRetry").hide();
-    fetchWithTimeout("/api/queryType", {
+
+    await fetchWithTimeout("/api/queryType", {
         method: "POST",
         headers: {
             "Content-Type": 'application/json;charset=utf-8'
         },
         body: JSON.stringify({
-            PageNumber: PageNumber,
-            NumberPerPage: NumberPerPage
+            PageNumber: int_pageNumber,
+            NumberPerPage: int_rowPerPage
         }),
         cache: "no-cache"
     }, 3000)
@@ -70,7 +72,7 @@ const renderTypeList = (NumberPerPage, PageNumber) => {
             } else {
                 for (let element of json.dbRes) {
                     $("#tableDataRender")
-                        .append(`<tr><td>${element.TID}</td><td>${element.TName}</td><td><button id="${element.TID}EditBtn" class="mdui-btn mdui-btn-icon mdui-ripple" onclick="editType(this)"><i class="mdui-icon material-icons">&#xe3c9;</i></button><button id="${element.TID}DelBtn" class="mdui-btn mdui-btn-icon mdui-ripple" onclick="delType(this)"><i class="mdui-icon material-icons">&#xe872;</i></button></td></tr>`)
+                        .append(tableRowWrapper(json.TID, json.TName))
                 }
                 $(".tableArea").show();
             }
@@ -84,7 +86,14 @@ const renderTypeList = (NumberPerPage, PageNumber) => {
         })
 }
 
-const queryTypeCount = () => {
+async function initializePage() {
+    let init_rowPerPage = parseInt(localStorage.getItem("rowPerPage"), 10);
+    let init_pageNumber = parseInt(localStorage.getItem("page"), 10);
+    await renderTypeList(init_rowPerPage, init_pageNumber);
+}
+
+async function queryTypeCount() {
+    let typeCount = 0;
     fetchWithTimeout("/api/queryTypeCount", {
         method: "POST",
         headers: {
@@ -94,13 +103,14 @@ const queryTypeCount = () => {
     }, 3000)
         .then(res => resErrorHandler(res))
         .then(json => {
-            console.log(json);
-            $("#typeCount").html(json.dbRes.TypeCount)
+            $("#typeCount").text(json.dbRes.TypeCount)
+            typeCount = parseInt(json.dbRes.TypeCount, 10);
         })
+    return typeCount;
 }
 
-const appendType = () => {
-    let typeName = $("#typeName").val();
+function appendType() {
+    let typeName = $typeName.val();
     if (typeName.length < 1) {
         mdui.snackbar({
             message: "类型名不能为空",
@@ -127,9 +137,12 @@ const appendType = () => {
                 customErr.code = 600
                 throw customErr
             }
-            $("#typeName").val("");
+            $typeName.val("");
             $("#retryBtn").click();
-
+            mdui.snackbar(`\"${typeName}\"添加成功`, {
+                timeout: 1500,
+                position: "top"
+            })
         })
         .catch(e => reqErrorHandler(e))
         .finally(() => {
@@ -137,11 +150,22 @@ const appendType = () => {
         })
 }
 
-const editType = e => {
+$TNameEditDialogInput.on("input change", e => {
+    let newTName = $TNameEditDialogInput[0].value;
+    let oldTName = $TNameEditDialogInput[0].placeholder;
+    if (newTName !== oldTName && newTName.length > 0) {
+        $("#editDialogConfirmBtn").prop("disabled", false);
+    } else {
+        $("#editDialogConfirmBtn").prop("disabled", true);
+    }
+})
+
+
+function editType(e) {
     let TID = String(e.id).slice(0, -7);
     let TName = "";
     $("#TNameEditDialogLabel").text("种类序号：" + TID).hide();
-    $("#TNameEditDialogInput").val("").hide();
+    $TNameEditDialogInput.val("").hide();
     $("#editDialog>.mdui-dialog-actions>button").prop("disabled", true);
     $("#TNameEditDialogIndicator").show();
     initEditDialog.open();
@@ -158,32 +182,15 @@ const editType = e => {
         .then(res => resErrorHandler(res))
         .then(json => {
             TName = json.dbRes.TName
-            $("#TNameEditDialogInput").prop("placeholder", TName).prop("disabled", false).show();
-            $("#editDialog>.mdui-dialog-actions>button").prop("disabled", false);
+            $TNameEditDialogInput.prop("placeholder", TName).prop("disabled", false).show();
+            $("#editDialog>.mdui-dialog-actions button:first-child").prop("disabled", false);
             $("#TNameEditDialogLabel").show();
             $("#TNameEditDialogIndicator").hide();
             initEditDialog.handleUpdate();
         })
-    $("#editDialogConfirmBtn").on("click", () => {
-        let newTName = $("#TNameEditDialogInput").value();
-        if(newTName.length < 1 && newTName === TName) {
-            console.log(newTName);
-        }
-        fetchWithTimeout("/api/editType", {
-            method: "POST",
-            headers: {
-                "Content-Type": 'application/json;charset=utf-8'
-            },
-            body: JSON.stringify({
-                TID: TID,
-                TName:TName
-            }),
-            cache: "no-cache"
-        }, 3000)
-    })
 }
 
-const delType = e => {
+function delType(e) {
     let TID = String(e.id).slice(0, -6);
     fetchWithTimeout("/api/editType", {
         method: "POST",
@@ -245,14 +252,18 @@ const delType = e => {
         )
         .then(res => resErrorHandler(res))
         .then(json => {
-            console.log(json);
-            mdui.alert("", "删除成功", () => {
-                renderTypeList(numberPerPage, pageNum);
-                queryTypeCount();
-            }, {
-                modal: true,
-                history: false
-            })
+            if (json.res) {
+                mdui.snackbar("删除成功", {
+                    position: "top",
+                    timeout: 1500,
+                    onOpen: () => {
+                        renderTypeList(numberPerPage, pageNum);
+                        queryTypeCount();
+                    }
+                })
+            } else {
+                throw new Error("内部错误")
+            }
         })
         .catch(e => {
             let errMsg = "未知错误，详情为：" + e.message;
@@ -280,13 +291,56 @@ const initEditDialog = new mdui.Dialog("#editDialog", {
 
 $("#retryBtn").click(() => renderTypeList(numberPerPage, pageNum))
 
-$("#resetBtn").click(() => $("#typeName").val(""))
+$("#resetBtn").click(() => $typeName.val(""))
 
 $("#addBtn").click(() => appendType()
 )
 
+document.getElementById("editDialog").addEventListener("confirm.mdui.dialog",
+    () => {
+        let newTName = $TNameEditDialogInput[0].value;
+        let oldTName = $TNameEditDialogInput[0].placeholder;
+        let TID = $("#TNameEditDialogLabel").text().slice(5);
+        if (!$TNameEditDialogInput[0].checkValidity()) {
+            mdui.snackbar("不能为空", {
+                position: "top",
+                timeout: 1500
+            })
+        } else if (newTName === oldTName) {
+            mdui.snackbar("名称与原来相同", {
+                position: "top",
+                timeout: 1500
+            })
 
-$(() => {
-    renderTypeList(numberPerPage, pageNum);
-    queryTypeCount();
+        } else {
+            fetchWithTimeout("/api/editType", {
+                method: "POST",
+                headers: {
+                    "Content-Type": 'application/json;charset=utf-8'
+                },
+                body: JSON.stringify({
+                    TID: TID,
+                    TName: newTName
+                }),
+                cache: "no-cache"
+            }, 3000)
+                .then(res => resErrorHandler(res))
+                .then(json => {
+                    if (json.res) {
+                        mdui.snackbar("名称修改成功", {
+                            timeout: 1500,
+                            position: "top"
+                        });
+                        initEditDialog.close();
+                    } else {
+                        alert(json.res)
+                    }
+                })
+        }
+    })
+
+
+$(async () => {
+    await initializePage();
+    await queryTypeCount();
 })
