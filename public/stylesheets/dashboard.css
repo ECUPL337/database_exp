@@ -20,10 +20,6 @@
     transition: all 0.3s ease-in-out;
 }
 
-.cardFaceImg > img:hover {
-    height: 130%;
-}
-
 .mdui-card-primary > div, .mdui-card-actions > button {
     color: black;
 }

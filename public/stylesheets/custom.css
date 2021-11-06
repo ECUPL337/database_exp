@@ -45,9 +45,10 @@
 }
 
 @media screen and (min-width: 600px) {
-    .fullPageWrapper{
-    height: calc(100vh - 64px);
-}}
+    .fullPageWrapper {
+        height: calc(100vh - 64px);
+    }
+}
 
 .enterArea {
     width: 100%;
@@ -95,14 +96,14 @@
 }
 
 .tableArea thead th {
-    background: #e2e2e2;
+    background: #E2E2E2;
     top: 0;
 }
 
 .tableArea tfoot th {
     background: white;
     position: sticky;
-    border-top:1px inset rgba(169,169,169,0.6);
+    border-top: 1px inset rgba(169, 169, 169, 0.6);
     bottom: 0;
 }
 
@@ -128,14 +129,14 @@
     flex-flow: column nowrap;
 }
 
-.displayPerPage {
+.row-of-all {
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
     justify-content: center;
 }
 
-.displayPerPage > b, .displayPerPage > select {
+.row-of-all > * {
     font-weight: 500;
     margin: 0 5px;
 }
@@ -147,10 +148,35 @@
     justify-content: center;
 }
 
-.pagination > input {
-    width: 60px;
+.pagination div:first-child {
+    margin-right: 20px;
+}
+
+.pagination div:last-child {
+    margin-left: 20px;
+}
+
+.pagination input[type=number] {
+    width: 40px;
     border: gray solid 1px;
     border-radius: 5px;
+    -moz-appearance: textfield;
+    padding: 4px 8px;
+    margin: 0 2px;
+}
+
+.pagination input::-webkit-outer-spin-button,
+.pagination input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.pagination span{
+    font-size: 0.9rem;
+}
+
+.pagination .row-per-page > select {
+    margin: 0 5px;
 }
 
 .delDialog .mdui-dialog-actions a:last-child {
